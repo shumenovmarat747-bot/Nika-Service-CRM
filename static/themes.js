@@ -74,7 +74,7 @@
         const themeMeta = document.querySelector('meta[name="theme-color"]');
         if (!themeMeta) return;
         const themeColorMap = {
-            dark: '#111118',
+            dark: '#0b1020',
             light: '#f5f4f8',
             retro: '#ff1493'
         };
