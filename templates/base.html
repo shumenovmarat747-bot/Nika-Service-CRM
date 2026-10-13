@@ -29,8 +29,8 @@
     {% block datatables_css %}{% endblock %}
 
     <!-- Themes CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='themes.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/staff_chat.css') }}">
+    <link rel="stylesheet" href="{{ static_url('themes.css') }}">
+    <link rel="stylesheet" href="{{ static_url('css/staff_chat.css') }}">
 
     <!-- CSRF token for JS (fetch) -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -38,8 +38,8 @@
     <!-- Дополнительные стили страницы -->
     {% block styles %}{% endblock %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/app-chrome.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/shumenov-theme.css') }}">
+    <link rel="stylesheet" href="{{ static_url('css/app-chrome.css') }}">
+    <link rel="stylesheet" href="{{ static_url('css/shumenov-theme.css') }}">
     <style nonce="{{ csp_nonce() }}">
         /* Pre-hint: базовые цвета до загрузки всех CSS */
         html.theme-dark, html.theme-dark body { background: #121217; color: #f4f2fb; }
@@ -54,7 +54,7 @@
             line-height: 1;
         }
     </style>
-    <script src="{{ url_for('static', filename='js/app_theme_early.js') }}"></script>
+    <script src="{{ static_url('js/app_theme_early.js') }}"></script>
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -167,7 +167,7 @@
     <!-- AdminLTE (локально) -->
     <script src="{{ url_for('static', filename='cdn/admin-lte/3.2/js/adminlte.min.js') }}"></script>
     <!-- Themes JS -->
-    <script src="{{ url_for('static', filename='themes.js') }}"></script>
+    <script src="{{ static_url('themes.js') }}"></script>
     <!-- Notifications JS -->
     <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
     <!-- Search JS -->
@@ -193,14 +193,14 @@
         "demoVisitorPollOnline": {{ "true" if demo_visitor_stats_enabled and demo_visitor_stats_admin and current_user.is_authenticated else "false" }}
     }
     </script>
-    <script src="{{ url_for('static', filename='js/app_boot.js') }}"></script>
+    <script src="{{ static_url('js/app_boot.js') }}"></script>
 
     <!-- Global fetch() wrapper to include CSRF token on unsafe requests -->
     <script src="{{ url_for('static', filename='js/app_fetch_csrf.js') }}"></script>
 
     <!-- Скрипт для управления состоянием меню -->
-    <script src="{{ url_for('static', filename='js/app_sidebar_menu.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/sidebar_preferences.js') }}"></script>
+    <script src="{{ static_url('js/app_sidebar_menu.js') }}"></script>
+    <script src="{{ static_url('js/sidebar_preferences.js') }}"></script>
 
     <!-- DataTables JS (опционально, подключается через block) -->
     {% block datatables_js %}{% endblock %}

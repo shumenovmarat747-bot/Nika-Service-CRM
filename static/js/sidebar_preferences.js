@@ -46,6 +46,7 @@
         document.querySelectorAll('[data-sidebar-section]').forEach(function (item) {
             var hidden = hiddenSections.indexOf(item.dataset.sidebarSection) !== -1;
             item.classList.toggle('sidebar-section-hidden', hidden);
+            item.hidden = hidden;
             item.setAttribute('aria-hidden', hidden ? 'true' : 'false');
         });
     }
