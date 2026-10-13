@@ -15,6 +15,13 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='cdn/font-awesome/7.0.0/css/all.min.css') }}">
     
     <style nonce="{{ csp_nonce() }}">
+        @font-face {
+            font-family: "Manrope";
+            src: url("{{ url_for('static', filename='fonts/manrope.woff2') }}") format("woff2");
+            font-style: normal;
+            font-weight: 200 800;
+            font-display: swap;
+        }
         :root {
             --ink: #1c1c24;
             --violet: #6945e9;
@@ -34,7 +41,7 @@
             align-items: center;
             justify-content: center;
             color: var(--ink);
-            font-family: Inter, Manrope, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-family: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
         body::before {
             content: "CRM";

@@ -6,73 +6,73 @@
     </a>
     <ul class="nav nav-pills nav-flush flex-column flex-grow-1">
         {% if has_any_permission('view_orders', 'create_orders', 'edit_orders', 'delete_orders') %}
-        <li>
+        <li data-sidebar-section="orders" data-sidebar-surface="desktop" data-sidebar-label="Заявки" data-sidebar-icon="fa-clipboard-list">
             <a href="{{ url_for('orders.all_orders', view='registry', status='in_progress') }}" class="nav-link py-2 border-bottom d-flex flex-column align-items-center justify-content-center{% if request.path == '/all_orders' or '/order/' in request.path %} active{% endif %}" 
                title="Заявки">
-                <i class="fas fa-file-alt" style="font-size: 1.25rem; display: block; text-align: center;"></i>
+                <span class="sidebar-icon-shell"><i class="fas fa-clipboard-list"></i></span>
                 <small class="mt-1" style="font-size: 0.65rem; line-height: 1; display: block; text-align: center;">Заявки</small>
             </a>
         </li>
         {% endif %}
         {% if has_permission('view_customers') %}
-        <li>
+        <li data-sidebar-section="customers" data-sidebar-surface="desktop" data-sidebar-label="Клиенты" data-sidebar-icon="fa-address-book">
             <a href="{{ url_for('customers.clients') }}" class="nav-link py-2 border-bottom d-flex flex-column align-items-center justify-content-center{% if request.path == '/clients' or '/clients/' in request.path or request.path == '/organizations' %} active{% endif %}" 
                title="Клиенты">
-                <i class="fas fa-users" style="font-size: 1.25rem; display: block; text-align: center;"></i>
+                <span class="sidebar-icon-shell"><i class="fas fa-address-book"></i></span>
                 <small class="mt-1" style="font-size: 0.65rem; line-height: 1; display: block; text-align: center;">Клиенты</small>
             </a>
         </li>
         {% endif %}
         {% if has_any_permission('view_warehouse', 'manage_warehouse') %}
-        <li>
+        <li data-sidebar-section="warehouse" data-sidebar-surface="desktop" data-sidebar-label="Склад" data-sidebar-icon="fa-boxes-stacked">
             <a href="{{ url_for('warehouse.parts_list') }}" class="nav-link py-2 border-bottom d-flex flex-column align-items-center justify-content-center{% if '/warehouse' in request.path and '/purchases' not in request.path %} active{% endif %}" 
                title="Склад">
-                <i class="fas fa-boxes" style="font-size: 1.25rem; display: block; text-align: center;"></i>
+                <span class="sidebar-icon-shell"><i class="fas fa-boxes-stacked"></i></span>
                 <small class="mt-1" style="font-size: 0.65rem; line-height: 1; display: block; text-align: center;">Склад</small>
             </a>
         </li>
         {% endif %}
         {% if has_any_permission('view_shop', 'manage_shop') %}
-        <li>
+        <li data-sidebar-section="shop" data-sidebar-surface="desktop" data-sidebar-label="Магазин" data-sidebar-icon="fa-bag-shopping">
             <a href="{{ url_for('shop.index') }}" class="nav-link py-2 border-bottom d-flex flex-column align-items-center justify-content-center{% if '/shop' in request.path %} active{% endif %}" 
                title="Магазин">
-                <i class="fas fa-shopping-cart" style="font-size: 1.25rem; display: block; text-align: center;"></i>
+                <span class="sidebar-icon-shell"><i class="fas fa-bag-shopping"></i></span>
                 <small class="mt-1" style="font-size: 0.65rem; line-height: 1; display: block; text-align: center;">Магазин</small>
             </a>
         </li>
         {% endif %}
         {% if has_any_permission('view_finance', 'manage_finance') %}
-        <li>
+        <li data-sidebar-section="finance" data-sidebar-surface="desktop" data-sidebar-label="Касса" data-sidebar-icon="fa-wallet">
             <a href="{{ url_for('finance.cash') }}" class="nav-link py-2 border-bottom d-flex flex-column align-items-center justify-content-center{% if '/finance' in request.path %} active{% endif %}" 
                title="Касса">
-                <i class="fas fa-cash-register" style="font-size: 1.25rem; display: block; text-align: center;"></i>
+                <span class="sidebar-icon-shell"><i class="fas fa-wallet"></i></span>
                 <small class="mt-1" style="font-size: 0.65rem; line-height: 1; display: block; text-align: center;">Касса</small>
             </a>
         </li>
         {% endif %}
         {% if has_any_permission('view_invoices', 'manage_invoices', 'mark_invoice_paid') %}
-        <li>
+        <li data-sidebar-section="invoices" data-sidebar-surface="desktop" data-sidebar-label="Счета" data-sidebar-icon="fa-receipt">
             <a href="{{ url_for('invoices.index') }}" class="nav-link py-2 border-bottom d-flex flex-column align-items-center justify-content-center{% if '/invoices' in request.path %} active{% endif %}"
                title="Счета">
-                <i class="fas fa-file-invoice-dollar" style="font-size: 1.25rem; display: block; text-align: center;"></i>
+                <span class="sidebar-icon-shell"><i class="fas fa-receipt"></i></span>
                 <small class="mt-1" style="font-size: 0.65rem; line-height: 1; display: block; text-align: center;">Счета</small>
             </a>
         </li>
         {% endif %}
         {% if has_permission('view_reports') %}
-        <li>
+        <li data-sidebar-section="reports" data-sidebar-surface="desktop" data-sidebar-label="Отчёты" data-sidebar-icon="fa-chart-line">
             <a href="{{ url_for('reports.dashboard') }}" class="nav-link py-2 border-bottom d-flex flex-column align-items-center justify-content-center{% if '/reports' in request.path %} active{% endif %}" 
                title="Отчеты">
-                <i class="fas fa-chart-pie" style="font-size: 1.25rem; display: block; text-align: center;"></i>
+                <span class="sidebar-icon-shell"><i class="fas fa-chart-line"></i></span>
                 <small class="mt-1" style="font-size: 0.65rem; line-height: 1; display: block; text-align: center;">Отчеты</small>
             </a>
         </li>
         {% endif %}
         {% if has_permission('salary.view') %}
-        <li>
+        <li data-sidebar-section="salary" data-sidebar-surface="desktop" data-sidebar-label="Зарплата" data-sidebar-icon="fa-coins">
             <a href="{{ url_for('salary_dashboard.index') }}" class="nav-link py-2 border-bottom d-flex flex-column align-items-center justify-content-center{% if '/salary' in request.path and '/reports/salary' not in request.path %} active{% endif %}" 
                title="Зарплата">
-                <i class="fas fa-user-tie" style="font-size: 1.25rem; display: block; text-align: center;"></i>
+                <span class="sidebar-icon-shell"><i class="fas fa-coins"></i></span>
                 <small class="mt-1" style="font-size: 0.65rem; line-height: 1; display: block; text-align: center;">Зарплата</small>
             </a>
         </li>
@@ -81,7 +81,7 @@
         <li>
             <a href="{{ url_for('main.settings') }}" class="nav-link py-2 border-bottom d-flex flex-column align-items-center justify-content-center{% if request.path == '/settings' or '/settings/' in request.path %} active{% endif %}" 
                title="Настройки">
-                <i class="fas fa-sliders-h" style="font-size: 1.25rem; display: block; text-align: center;"></i>
+                <span class="sidebar-icon-shell"><i class="fas fa-sliders"></i></span>
                 <small class="mt-1" style="font-size: 0.65rem; line-height: 1; display: block; text-align: center;">Настройки</small>
             </a>
         </li>
@@ -89,7 +89,7 @@
         <li class="dropend">
             <a href="#" class="nav-link py-2 border-bottom d-flex flex-column align-items-center justify-content-center link-dark text-decoration-none dropdown-toggle"
                id="dropdownUser3" data-bs-toggle="dropdown" aria-expanded="false" title="Пользователь">
-                <i class="fas fa-user-circle" style="font-size: 1.5rem; display: block; text-align: center;"></i>
+                <span class="sidebar-icon-shell"><i class="fas fa-circle-user"></i></span>
                 <small class="mt-1" style="font-size: 0.65rem; line-height: 1; display: block; text-align: center;">Профиль</small>
             </a>
             <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser3">
@@ -105,8 +105,20 @@
                 </li>
             </ul>
         </li>
+        <li class="mt-auto sidebar-customize-item">
+            <button type="button"
+                    class="nav-link py-2 d-flex flex-column align-items-center justify-content-center w-100 sidebar-customize-open"
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="#sidebarCustomizer"
+                    aria-controls="sidebarCustomizer"
+                    title="Настроить панель"
+                    aria-label="Настроить левую панель">
+                <span class="sidebar-icon-shell"><i class="fas fa-wand-magic-sparkles"></i></span>
+                <small class="mt-1" style="font-size: 0.65rem; line-height: 1; display: block; text-align: center;">Панель</small>
+            </button>
+        </li>
         {% if current_user.is_authenticated and has_any_permission('view_orders', 'create_orders', 'edit_orders', 'view_finance', 'manage_finance', 'view_warehouse', 'manage_warehouse', 'manage_shop', 'salary.view') %}
-        <li class="mt-auto">
+        <li data-sidebar-section="chat" data-sidebar-surface="desktop" data-sidebar-label="Чат" data-sidebar-icon="fa-message">
             <button type="button"
                     class="nav-link py-2 border-top staff-chat-sidebar-btn d-flex flex-column align-items-center justify-content-center w-100"
                     id="staffChatFab"
@@ -115,7 +127,7 @@
                     aria-label="Чат сотрудников"
                     aria-pressed="false">
                 <span class="staff-chat-sidebar-icon-wrap">
-                    <i class="fas fa-comments" style="font-size: 1.25rem; display: block; text-align: center;"></i>
+                    <i class="fas fa-message"></i>
                     <span class="staff-chat-fab-badge" id="staffChatFabBadge" style="display: none;">0</span>
                 </span>
                 <small class="mt-1" style="font-size: 0.65rem; line-height: 1; display: block; text-align: center;">Чат</small>
@@ -125,127 +137,24 @@
     </ul>
 </div>
 
-<style>
-/* Стили для подписей в боковом меню */
-.bootstrap_sidebar .nav-link {
-    text-align: center;
-}
-
-.bootstrap_sidebar .nav-link i {
-    width: 100%;
-    text-align: center;
-}
-
-.bootstrap_sidebar .nav-link small {
-    color: inherit;
-    font-weight: 500;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 100%;
-    text-align: center;
-}
-
-.bootstrap_sidebar .nav-link.active small,
-.bootstrap_sidebar .nav-link:hover small {
-    color: inherit;
-}
-
-.bootstrap_sidebar .nav-link.active {
-    background-color: var(--bs-primary);
-    color: #fff;
-}
-
-.bootstrap_sidebar .nav-link.active small {
-    color: #fff;
-}
-
-.bootstrap_sidebar .nav-link.active i {
-    color: #fff;
-}
-
-/* Иконка в верхней части */
-.bootstrap_sidebar > a:first-child i,
-.bootstrap_sidebar .sidebar-brand-link i {
-    width: 100%;
-    text-align: center;
-}
-
-.bootstrap_sidebar > a:first-child small,
-.bootstrap_sidebar .sidebar-brand-link small {
-    width: 100%;
-    text-align: center;
-}
-
-/* Бренд в верхней части */
-.bootstrap_sidebar .sidebar-brand-link,
-.bootstrap_sidebar .sidebar-brand-link small,
-.bootstrap_sidebar .sidebar-brand-link i {
-    color: #e67e22 !important;
-}
-
-.bootstrap_sidebar .sidebar-brand-link:hover,
-.bootstrap_sidebar .sidebar-brand-link:hover small,
-.bootstrap_sidebar .sidebar-brand-link:hover i {
-    color: #f39c12 !important;
-}
-
-.bootstrap_sidebar .sidebar-brand-link.active,
-.bootstrap_sidebar .sidebar-brand-link.active small,
-.bootstrap_sidebar .sidebar-brand-link.active i {
-    color: #fff !important;
-}
-
-/* Dropdown профиль */
-.bootstrap_sidebar .dropdown-toggle i {
-    width: 100%;
-    text-align: center;
-}
-
-.bootstrap_sidebar .dropdown-toggle small {
-    width: 100%;
-    text-align: center;
-}
-
-/* Темная тема */
-.theme-dark .bootstrap_sidebar {
-    background-color: #1e1e1e !important;
-}
-
-.theme-dark .bootstrap_sidebar .nav-link {
-    color: #e0e0e0;
-}
-
-.theme-dark .bootstrap_sidebar .nav-link:hover {
-    background-color: #2d2d2d !important;
-    color: #fff;
-}
-
-.theme-dark .bootstrap_sidebar .nav-link.active {
-    background-color: #4d8af0;
-    color: #fff;
-}
-
-.theme-dark .bootstrap_sidebar .sidebar-brand-link:not(.active),
-.theme-dark .bootstrap_sidebar .sidebar-brand-link:not(.active) small,
-.theme-dark .bootstrap_sidebar .sidebar-brand-link:not(.active) i {
-    color: #e67e22 !important;
-}
-
-.theme-dark .bootstrap_sidebar .sidebar-brand-link:not(.active):hover,
-.theme-dark .bootstrap_sidebar .sidebar-brand-link:not(.active):hover small,
-.theme-dark .bootstrap_sidebar .sidebar-brand-link:not(.active):hover i {
-    color: #f39c12 !important;
-}
-
-/* Профиль внизу (dropdown) — тот же цвет в тёмной теме */
-.theme-dark .bootstrap_sidebar .dropdown-toggle.link-dark {
-    color: #e0e0e0 !important;
-}
-
-.theme-dark .bootstrap_sidebar .dropdown-toggle.link-dark:hover {
-    color: #fff !important;
-    background-color: #2d2d2d !important;
-}
-</style>
-
+<div class="offcanvas offcanvas-end sidebar-customizer no-print" tabindex="-1" id="sidebarCustomizer" aria-labelledby="sidebarCustomizerTitle">
+    <div class="offcanvas-header">
+        <div>
+            <span class="sidebar-customizer-kicker">Моя навигация</span>
+            <h5 class="offcanvas-title" id="sidebarCustomizerTitle">Настроить панель</h5>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Закрыть"></button>
+    </div>
+    <div class="offcanvas-body">
+        <p class="sidebar-customizer-copy">Оставьте только нужные разделы. Настройка сохранится для вашего пользователя в этом браузере.</p>
+        <div class="sidebar-customizer-list" id="sidebarCustomizerList" role="group" aria-label="Видимость разделов"></div>
+        <button type="button" class="btn btn-outline-primary w-100 sidebar-customizer-reset" id="sidebarCustomizerReset">
+            <i class="fas fa-rotate-left me-2"></i>Показать все разделы
+        </button>
+        <div class="sidebar-customizer-note">
+            <i class="fas fa-shield-halved"></i>
+            <span>Скрытие пункта не удаляет данные и не меняет права доступа.</span>
+        </div>
+        <div class="visually-hidden" id="sidebarCustomizerStatus" aria-live="polite"></div>
+    </div>
+</div>

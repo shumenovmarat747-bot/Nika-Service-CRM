@@ -10,11 +10,11 @@
         var themeMeta = document.querySelector('meta[name="theme-color"]');
         if (themeMeta) {
             var themeColorMap = {
-                dark: '#1a1a1a',
-                light: '#ecf0f5',
+                dark: '#111118',
+                light: '#f5f4f8',
                 retro: '#ff1493'
             };
-            themeMeta.setAttribute('content', themeColorMap[stored] || '#007bff');
+            themeMeta.setAttribute('content', themeColorMap[stored] || '#1c1c24');
         }
     } catch (e) {
         // localStorage may be unavailable

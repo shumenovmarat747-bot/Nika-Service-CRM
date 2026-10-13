@@ -10,81 +10,90 @@
     <ul class="mac-mobile-drawer-nav list-unstyled mb-0">
         <li>
             <a href="{{ url_for('main.home') }}" class="mac-mobile-drawer-link{% if request.path == '/' %} active{% endif %}">
-                <i class="fas fa-tachometer-alt"></i><span>Главная</span>
+                <i class="fas fa-house"></i><span>Главная</span>
             </a>
         </li>
         {% if has_any_permission('view_orders', 'create_orders', 'edit_orders', 'delete_orders') %}
-        <li>
+        <li data-sidebar-section="orders" data-sidebar-surface="mobile">
             <a href="{{ url_for('orders.all_orders', view='registry', status='in_progress') }}" class="mac-mobile-drawer-link{% if request.path == '/all_orders' or '/order/' in request.path %} active{% endif %}">
-                <i class="fas fa-file-alt"></i><span>Заявки</span>
+                <i class="fas fa-clipboard-list"></i><span>Заявки</span>
             </a>
         </li>
         {% endif %}
         {% if has_permission('view_customers') %}
-        <li>
+        <li data-sidebar-section="customers" data-sidebar-surface="mobile">
             <a href="{{ url_for('customers.clients') }}" class="mac-mobile-drawer-link{% if request.path == '/clients' or '/clients/' in request.path or request.path == '/organizations' %} active{% endif %}">
-                <i class="fas fa-users"></i><span>Клиенты</span>
+                <i class="fas fa-address-book"></i><span>Клиенты</span>
             </a>
         </li>
         {% endif %}
         {% if has_any_permission('view_warehouse', 'manage_warehouse') %}
-        <li>
+        <li data-sidebar-section="warehouse" data-sidebar-surface="mobile">
             <a href="{{ url_for('warehouse.parts_list') }}" class="mac-mobile-drawer-link{% if '/warehouse' in request.path and '/purchases' not in request.path %} active{% endif %}">
-                <i class="fas fa-boxes"></i><span>Склад</span>
+                <i class="fas fa-boxes-stacked"></i><span>Склад</span>
             </a>
         </li>
         {% endif %}
         {% if has_any_permission('view_shop', 'manage_shop') %}
-        <li>
+        <li data-sidebar-section="shop" data-sidebar-surface="mobile">
             <a href="{{ url_for('shop.index') }}" class="mac-mobile-drawer-link{% if '/shop' in request.path %} active{% endif %}">
-                <i class="fas fa-shopping-cart"></i><span>Магазин</span>
+                <i class="fas fa-bag-shopping"></i><span>Магазин</span>
             </a>
         </li>
         {% endif %}
         {% if has_any_permission('view_finance', 'manage_finance') %}
-        <li>
+        <li data-sidebar-section="finance" data-sidebar-surface="mobile">
             <a href="{{ url_for('finance.cash') }}" class="mac-mobile-drawer-link{% if '/finance' in request.path %} active{% endif %}">
-                <i class="fas fa-cash-register"></i><span>Касса</span>
+                <i class="fas fa-wallet"></i><span>Касса</span>
             </a>
         </li>
         {% endif %}
         {% if has_any_permission('view_invoices', 'manage_invoices', 'mark_invoice_paid') %}
-        <li>
+        <li data-sidebar-section="invoices" data-sidebar-surface="mobile">
             <a href="{{ url_for('invoices.index') }}" class="mac-mobile-drawer-link{% if '/invoices' in request.path %} active{% endif %}">
-                <i class="fas fa-file-invoice-dollar"></i><span>Счета</span>
+                <i class="fas fa-receipt"></i><span>Счета</span>
             </a>
         </li>
         {% endif %}
         {% if has_permission('view_reports') %}
-        <li>
+        <li data-sidebar-section="reports" data-sidebar-surface="mobile">
             <a href="{{ url_for('reports.dashboard') }}" class="mac-mobile-drawer-link{% if '/reports' in request.path %} active{% endif %}">
-                <i class="fas fa-chart-pie"></i><span>Отчёты</span>
+                <i class="fas fa-chart-line"></i><span>Отчёты</span>
             </a>
         </li>
         {% endif %}
         {% if has_permission('salary.view') %}
-        <li>
+        <li data-sidebar-section="salary" data-sidebar-surface="mobile">
             <a href="{{ url_for('salary_dashboard.index') }}" class="mac-mobile-drawer-link{% if '/salary' in request.path and '/reports/salary' not in request.path %} active{% endif %}">
-                <i class="fas fa-user-tie"></i><span>Зарплата</span>
+                <i class="fas fa-coins"></i><span>Зарплата</span>
             </a>
         </li>
         {% endif %}
         {% if has_permission('manage_users') %}
         <li>
             <a href="{{ url_for('main.settings') }}" class="mac-mobile-drawer-link{% if request.path == '/settings' or '/settings/' in request.path %} active{% endif %}">
-                <i class="fas fa-sliders-h"></i><span>Настройки</span>
+                <i class="fas fa-sliders"></i><span>Настройки</span>
             </a>
         </li>
         {% endif %}
-        {% if current_user.is_authenticated and has_any_permission('view_orders', 'create_orders', 'edit_orders', 'view_finance', 'manage_finance', 'view_warehouse', 'manage_warehouse', 'manage_shop', 'salary.view') %}
         <li class="mt-2 pt-2 border-top">
+            <button type="button"
+                    class="mac-mobile-drawer-link sidebar-customize-open w-100 border-0"
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="#sidebarCustomizer"
+                    aria-controls="sidebarCustomizer">
+                <i class="fas fa-wand-magic-sparkles"></i><span>Настроить панель</span>
+            </button>
+        </li>
+        {% if current_user.is_authenticated and has_any_permission('view_orders', 'create_orders', 'edit_orders', 'view_finance', 'manage_finance', 'view_warehouse', 'manage_warehouse', 'manage_shop', 'salary.view') %}
+        <li data-sidebar-section="chat" data-sidebar-surface="mobile">
             <button type="button"
                     class="mac-mobile-drawer-link staff-chat-sidebar-btn w-100 border-0"
                     data-staff-chat-toggle
                     title="Чат сотрудников"
                     aria-label="Чат сотрудников"
                     aria-pressed="false">
-                <i class="fas fa-comments"></i>
+                <i class="fas fa-message"></i>
                 <span>Чат</span>
                 <span class="staff-chat-fab-badge" style="display: none;">0</span>
             </button>
