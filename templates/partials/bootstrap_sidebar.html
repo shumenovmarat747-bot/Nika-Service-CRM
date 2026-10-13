@@ -1,8 +1,8 @@
 <!-- Bootstrap 5 Sidebar (no-print: скрывать при печати) -->
 <div class="bootstrap-sidebar d-flex flex-column flex-shrink-0 bg-light no-print" style="width: 5.5rem; position: fixed; left: 0; top: 44px; height: calc(100vh - 44px); z-index: 1020;">
-    <a href="{{ url_for('main.home') }}" class="sidebar-brand-link nav-link d-flex flex-column align-items-center justify-content-center p-3 py-2 border-bottom text-decoration-none text-center{% if request.path == '/' %} active{% endif %}" title="Nika CRM">
-        <i class="fas fa-tachometer-alt" style="font-size: 1.5rem; display: block; text-align: center;"></i>
-        <small class="mt-1" style="font-size: 0.65rem; line-height: 1; display: block; text-align: center;">Nika CRM</small>
+    <a href="{{ url_for('main.home') }}" class="sidebar-brand-link nav-link d-flex flex-column align-items-center justify-content-center p-3 py-2 border-bottom text-decoration-none text-center{% if request.path == '/' %} active{% endif %}" title="CRM Шуменова">
+        <span class="sidebar-brand-mark" aria-hidden="true">Ш</span>
+        <small class="mt-1" style="font-size: 0.65rem; line-height: 1; display: block; text-align: center;">Главная</small>
     </a>
     <ul class="nav nav-pills nav-flush flex-column flex-grow-1">
         {% if has_any_permission('view_orders', 'create_orders', 'edit_orders', 'delete_orders') %}
@@ -177,7 +177,7 @@
     text-align: center;
 }
 
-/* Название Nika CRM в топе — оранжевый цвет */
+/* Бренд в верхней части */
 .bootstrap_sidebar .sidebar-brand-link,
 .bootstrap_sidebar .sidebar-brand-link small,
 .bootstrap_sidebar .sidebar-brand-link i {

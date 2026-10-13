@@ -2,12 +2,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
   <defs>
     <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#3b82f6"/>
-      <stop offset="1" stop-color="#8b5cf6"/>
+      <stop offset="0" stop-color="#8d6cff"/>
+      <stop offset="1" stop-color="#5b38d1"/>
     </linearGradient>
   </defs>
   <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#g)"/>
-  <path d="M20 44V20h6l12 16V20h6v24h-6L26 28v16h-6z" fill="#ffffff"/>
+  <path d="M17 44V20h7v8h16v-8h7v24h-7v-9H24v9h-7z" fill="#ffffff"/>
+  <circle cx="49" cy="15" r="6" fill="#dbff8d"/>
 </svg>
 
 

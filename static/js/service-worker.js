@@ -91,7 +91,7 @@ self.addEventListener('fetch', function(event) {
 
 self.addEventListener('push', function(event) {
   const data = event.data ? event.data.json() : {};
-  const title = data.title || 'Nika CRM';
+  const title = data.title || 'CRM Шуменова';
   const options = {
     body: data.message || 'Новое уведомление',
     icon: '/static/favicon.svg',

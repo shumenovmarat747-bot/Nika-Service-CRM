@@ -15,7 +15,7 @@
     <link rel="alternate" hreflang="x-default" href="{{ page_url }}">
     <meta property="og:type" content="article">
     <meta property="og:locale" content="ru_RU">
-    <meta property="og:site_name" content="Nika CRM">
+    <meta property="og:site_name" content="CRM Шуменова">
     <meta property="og:title" content="{{ page_title }}">
     <meta property="og:description" content="{{ page_description }}">
     <meta property="og:url" content="{{ page_url }}">
@@ -24,12 +24,12 @@
     <meta property="og:image:type" content="image/jpeg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="Nika CRM — документация для сервисных центров">
+    <meta property="og:image:alt" content="CRM Шуменова — документация для сервисных центров">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ page_title }}">
     <meta name="twitter:description" content="{{ page_description }}">
     <meta name="twitter:image" content="{{ og_image_url }}">
-    <meta name="twitter:image:alt" content="Nika CRM — документация">
+    <meta name="twitter:image:alt" content="CRM Шуменова — документация">
     <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
     <link href="{{ url_for('static', filename='cdn/bootstrap/5.3.0/css/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='cdn/font-awesome/7.0.0/css/all.min.css') }}">
@@ -47,7 +47,7 @@
           "inLanguage": "ru-RU",
           "isPartOf": {
             "@type": "WebSite",
-            "name": "Nika CRM Demo",
+            "name": "CRM Шуменова Demo",
             "url": {{ (canonical_url ~ '/')|tojson }}
           },
           "author": {
@@ -56,7 +56,7 @@
           },
           "publisher": {
             "@type": "Organization",
-            "name": "Nika CRM",
+            "name": "CRM Шуменова",
             "url": {{ (canonical_url ~ '/')|tojson }}
           },
           "image": {{ og_image_url|tojson }}
@@ -82,7 +82,7 @@
     <a class="ml-skip" href="#docs-main">К содержанию</a>
     <header class="ml-nav">
         <div class="ml-nav-inner">
-            <a class="ml-brand" href="{{ url_for('main.home') }}" aria-label="Nika CRM — на главную демо">Nika CRM</a>
+            <a class="ml-brand" href="{{ url_for('main.home') }}" aria-label="CRM Шуменова — на главную демо">CRM Шуменова</a>
             <nav class="ml-nav-links" aria-label="Разделы документации">
                 <a class="ml-btn ml-btn-ghost{% if active_docs_nav == 'hub' %} is-active{% endif %}"
                    href="{{ url_for('public_docs.docs_hub') }}"
@@ -123,7 +123,7 @@
     </main>
 
     <footer class="ml-footer">
-        <div class="ml-footer-brand">Nika CRM</div>
+        <div class="ml-footer-brand">CRM Шуменова</div>
         <p>
             <a href="{{ url_for('main.home') }}">На главную</a>
             · <a href="{{ url_for('public_docs.docs_hub') }}">Документация</a>

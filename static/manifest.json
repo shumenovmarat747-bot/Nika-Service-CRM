@@ -1,11 +1,11 @@
 {
-  "name": "Nika CRM",
-  "short_name": "Nika CRM",
+  "name": "CRM Шуменова",
+  "short_name": "Шуменова CRM",
   "description": "Система управления сервисным центром",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#007bff",
+  "background_color": "#f4f3f8",
+  "theme_color": "#1c1c24",
   "orientation": "any",
   "icons": [
     {
