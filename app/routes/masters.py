@@ -39,6 +39,12 @@ def get_master(master_id):
         master = MasterService.get_master_by_id(master_id)
         if not master:
             return jsonify({'success': False, 'error': 'Мастер не найден'}), 404
+        if master.get('user_id'):
+            from app.services.user_service import UserService
+            user = UserService.get_user_by_id(master['user_id'], include_inactive=True)
+            master['login'] = user.get('username') if user else None
+        else:
+            master['login'] = None
         return jsonify({'success': True, 'master': master})
     except Exception as e:
         logger.error(f"Ошибка при получении мастера {master_id}: {e}", exc_info=True)
@@ -64,14 +70,14 @@ def create_master():
         
         data = request.get_json() or {}
         name = data.get('name')  # ФИО
-        login = data.get('login') or data.get('username')  # Email для входа
+        login = data.get('login') or data.get('username')
         password = data.get('password')
         
         if not name:
             return jsonify({'success': False, 'error': 'ФИО обязательно'}), 400
         
         if not login:
-            return jsonify({'success': False, 'error': 'Логин (Email) обязателен'}), 400
+            return jsonify({'success': False, 'error': 'Логин обязателен'}), 400
         
         if not password:
             return jsonify({'success': False, 'error': 'Пароль обязателен'}), 400
@@ -109,8 +115,13 @@ def create_master():
             UserService.create_role(custom_role_name, permission_ids)
             logger.info(f"Создана кастомная роль {custom_role_name} с правами: {permission_ids}")
             
-            # Создаем пользователя с логином (email) и стандартной ролью (чтобы обойти валидацию)
-            user_id = UserService.create_user(username=login, password=password, role='master')
+            # Создаем пользователя с логином и стандартной ролью (чтобы обойти валидацию)
+            user_id = UserService.create_user(
+                username=login,
+                password=password,
+                role='master',
+                display_name=name,
+            )
             
             # Обновляем роль на кастомную
             from app.database.connection import get_db_connection
@@ -179,28 +190,22 @@ def update_master(master_id):
     try:
         data = request.get_json() or {}
         name = data.get('name')
+        login = (data.get('login') or '').strip()
         
         master = MasterService.get_master_by_id(master_id)
         if not master:
             return jsonify({'success': False, 'error': 'Мастер не найден'}), 404
         
-        # Если изменилось имя мастера, обновляем username связанного пользователя
-        if name and master.get('user_id'):
+        # ФИО и логин — разные поля: изменение имени не должно менять данные для входа.
+        if master.get('user_id'):
             from app.services.user_service import UserService
-            from app.database.connection import get_db_connection
-            import sqlite3
-            
-            try:
-                with get_db_connection() as conn:
-                    cursor = conn.cursor()
-                    # Обновляем username пользователя
-                    cursor.execute(
-                        'UPDATE users SET username = ? WHERE id = ?',
-                        (name.strip(), master['user_id'])
-                    )
-                    conn.commit()
-            except Exception as e:
-                logger.warning(f"Не удалось обновить username для пользователя {master['user_id']}: {e}")
+            if not login:
+                return jsonify({'success': False, 'error': 'Логин обязателен'}), 400
+            UserService.update_user(
+                master['user_id'],
+                username=login,
+                display_name=name if name is not None else master.get('name'),
+            )
         
         # Обновляем права кастомной роли, если они указаны
         permission_ids = data.get('permission_ids')

@@ -159,7 +159,7 @@ class DeviceQueries:
                         COALESCE(os.name, o.status) AS status_name,
                         COALESCE(os.color, '#6c757d') AS status_color,
                         o.prepayment,
-                        o.password,
+                        o.address,
                         COALESCE(
                             (SELECT ''' + appearance_agg + ''' 
                              FROM order_appearance_tags oat 
@@ -178,10 +178,8 @@ class DeviceQueries:
                         COALESCE(om.name, o.model) AS model,
                         c.name AS customer_name,
                         c.phone AS customer_phone,
-                        c.email AS customer_email,
                         dt.name AS device_type_name,
                         db.name AS device_brand_name,
-                        d.serial_number AS device_serial_number,
                         mgr.name AS manager_name,
                         ms.name AS master_name,
                         (SELECT COALESCE(SUM(amount), 0) FROM payments WHERE order_id = o.id) AS total_paid,

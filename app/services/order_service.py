@@ -189,27 +189,22 @@ class OrderService:
         # Разделяем данные на категории
         # Исключаем только финансовые поля из order, но оставляем связанные данные для обратной совместимости
         order = {k: v for k, v in flat_data.items() 
-                if k not in ['services_total', 'parts_total', 'total', 'paid', 'debt']}
+                if k not in ['services_total', 'parts_total', 'total', 'paid', 'debt', 'password']}
         
         # Добавляем алиасы для обратной совместимости с шаблоном
-        # Шаблон ожидает order.client_name, order.phone, order.email напрямую
+        # Шаблон ожидает order.client_name и order.phone напрямую.
         if 'customer_name' in flat_data:
             order['client_name'] = flat_data.get('customer_name')
         if 'customer_phone' in flat_data:
             order['phone'] = flat_data.get('customer_phone')
-        if 'customer_email' in flat_data:
-            order['email'] = flat_data.get('customer_email')
-        
         customer = {
             'id': flat_data.get('customer_id'),
             'name': flat_data.get('customer_name'),
-            'phone': flat_data.get('customer_phone'),
-            'email': flat_data.get('customer_email')
+            'phone': flat_data.get('customer_phone')
         }
         
         device = {
             'id': flat_data.get('device_id'),
-            'serial_number': flat_data.get('serial_number'),
             'device_type_id': flat_data.get('device_type_id'),
             'device_type_name': flat_data.get('device_type_name'),
             'device_brand_id': flat_data.get('device_brand_id'),
@@ -760,16 +755,14 @@ class OrderService:
     def create_order(
         customer_name: str,
         phone: str,
-        email: str,
+        address: str,
         device_type_id: int,
         device_brand_id: int,
         manager_id: int,
         master_id: Optional[int] = None,
-        serial_number: Optional[str] = None,
         prepayment: str = '0',
         prepayment_method: str = 'cash',
         estimated_cost: str = '0',
-        password: Optional[str] = None,
         appearance: Optional[str] = None,
         comment: Optional[str] = None,
         symptom_tags: Optional[str] = None,
@@ -782,16 +775,14 @@ class OrderService:
         Args:
             customer_name: Имя клиента
             phone: Телефон клиента
-            email: Email клиента
+            address: Адрес выезда/приёма техники
             device_type_id: ID типа устройства
             device_brand_id: ID бренда устройства
             manager_id: ID менеджера
             master_id: ID мастера (опционально)
-            serial_number: Серийный номер (опционально)
             prepayment: Предоплата
             prepayment_method: Способ предоплаты (cash, card, transfer)
             estimated_cost: Предварительная стоимость (оценка)
-            password: Пароль от устройства
             appearance: Внешний вид
             comment: Комментарий
             symptom_tags: Теги симптомов
@@ -841,10 +832,10 @@ class OrderService:
                 customer_was_created = False
                 if customer:
                     customer_id = customer.id
-                    # Обновляем данные клиента
-                    customer.update(name=customer_name, email=email)
+                    # Контакты клиента редактируются отдельно; заявка обновляет только имя.
+                    customer.update(name=customer_name)
                 else:
-                    customer = Customer.create(name=customer_name, phone=phone, email=email)
+                    customer = Customer.create(name=customer_name, phone=phone, email=None)
                     if not customer:
                         raise DatabaseError("Ошибка при создании клиента")
                     customer_id = customer.id
@@ -855,8 +846,8 @@ class OrderService:
                 device = None
                 for d in devices:
                     if (d.device_type_id == device_type_id and 
-                        d.device_brand_id == device_brand_id and 
-                        d.serial_number == serial_number):
+                        d.device_brand_id == device_brand_id and
+                        not d.serial_number):
                         device = d
                         break
                 
@@ -883,8 +874,8 @@ class OrderService:
                         customer_id=customer_id,
                         device_type_id=device_type_id,
                         device_brand_id=device_brand_id,
-                        serial_number=serial_number,
-                        password=password,
+                        serial_number=None,
+                        password=None,
                         symptom_tags=symptom_tags,
                         appearance_tags=appearance,
                         comment=None  # Комментарий к устройству не передается при создании заявки
@@ -899,8 +890,6 @@ class OrderService:
                         device.id,
                         device_type_id=device_type_id,
                         device_brand_id=device_brand_id,
-                        serial_number=serial_number,
-                        password=password,
                         symptom_tags=symptom_tags,
                         appearance_tags=appearance
                     )
@@ -942,6 +931,7 @@ class OrderService:
                     has_model_id_column = 'model_id' in columns
                     has_prepayment_cents_column = 'prepayment_cents' in columns
                     has_estimated_cost_column = 'estimated_cost' in columns
+                    has_address_column = 'address' in columns
                     logger.debug(f"Колонки в таблице orders: {columns}, has_model_column={has_model_column}, has_model_id_column={has_model_id_column}")
                 except Exception as pragma_e:
                     logger.warning(f"Не удалось проверить структуру таблицы: {pragma_e}")
@@ -949,6 +939,7 @@ class OrderService:
                     has_model_id_column = True
                     has_prepayment_cents_column = False
                     has_estimated_cost_column = False
+                    has_address_column = False
                 
                 try:
                     # Формируем список колонок и значений для INSERT
@@ -959,7 +950,7 @@ class OrderService:
                     ]
                     insert_values = [
                         order_uuid, device_id, customer_id, manager_id, master_id,
-                        status_id, status_code, prepayment, password, appearance,
+                        status_id, status_code, prepayment, None, appearance,
                         comment, symptom_tags, 0, created_at
                     ]
 
@@ -982,6 +973,10 @@ class OrderService:
                     if has_estimated_cost_column:
                         insert_columns.append('estimated_cost')
                         insert_values.append(str(estimated_cost_value))
+
+                    if has_address_column:
+                        insert_columns.append('address')
+                        insert_values.append((address or '').strip() or None)
                     
                     # Добавляем model и model_id если колонки существуют
                     if has_model_column:
@@ -1136,8 +1131,8 @@ class OrderService:
                         details={
                             'UUID заявки': order_uuid,
                             'Клиент': customer_name,
+                            'Адрес': (address or '').strip() or 'Не указан',
                             'Устройство': f"{device_type_name} {device_brand_name}",
-                            'Серийный номер': serial_number,
                             'Статус': status_name,
                             'Менеджер': manager_name,
                             'Мастер': master_name
@@ -1168,8 +1163,7 @@ class OrderService:
                             entity_id=customer_id,
                             details={
                                 'name': customer_name,
-                                'phone': phone,
-                                'email': email or 'Не указан'
+                                'phone': phone
                             }
                         )
                     except Exception as e:

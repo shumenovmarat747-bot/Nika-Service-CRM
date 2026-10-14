@@ -41,15 +41,13 @@
                 <tr><td>Дата приема:</td><td>{{ order.created_at|format_date(true) if order.created_at else 'Не указана' }}</td></tr>
                 <tr><td>Клиент:</td><td><strong>{{ order.client_name }}</strong></td></tr>
                 <tr><td>Телефон:</td><td>{{ order.phone_display or order.phone }}</td></tr>
-                {% if order.email %}<tr><td>Email:</td><td>{{ order.email }}</td></tr>{% endif %}
+                {% if order.address %}<tr><td>Адрес:</td><td>{{ order.address }}</td></tr>{% endif %}
             </table>
             <h4 class="mt-4 mb-3">Информация об устройстве:</h4>
             <table class="print-info-table">
                 <tr><td>Тип устройства:</td><td>{{ order.device_type_name or 'Не указан' }}</td></tr>
                 <tr><td>Бренд:</td><td>{{ order.device_brand_name or 'Не указан' }}</td></tr>
                 <tr><td>Модель:</td><td><strong>{{ order.model or 'Не указана' }}</strong></td></tr>
-                {% if order.serial_number %}<tr><td>Серийный номер:</td><td>{{ order.serial_number }}</td></tr>{% endif %}
-                {% if order.password %}<tr><td>Пароль / код:</td><td>{{ order.password }}</td></tr>{% endif %}
             </table>
             {% if order.symptom_tags %}
             <p><strong>Неисправность:</strong> {{ order.symptom_tags }}</p>
@@ -316,20 +314,18 @@
                                         </div>
                                     </div>
                                             <div class="compact-info-item highlight-item">
-                                                <span class="compact-label"><i class="fas fa-envelope me-1"></i>Email:</span>
+                                                <span class="compact-label"><i class="fas fa-map-marker-alt me-1"></i>Адрес:</span>
                                                 <div class="compact-value">
-                                            {% if order.email %}
-                                                        <div class="d-flex align-items-center gap-2">
-                                                            <a href="mailto:{{ order.email }}" class="contact-value-main">{{ order.email }}</a>
-                                                            <button class="quick-action-btn btn-copy" data-copy-value="{{ order.email|e }}" onclick="copyToClipboard(this.dataset.copyValue, event)" title="Копировать">
-                                                    <i class="fas fa-copy"></i>
-                                                </button>
-                                                        </div>
-                                            {% else %}
-                                                <span>—</span>
-                                            {% endif %}
-                                        </div>
-                                    </div>
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <span class="contact-value-main">{{ order.address or 'Не указан' }}</span>
+                                                        {% if order.address %}
+                                                        <button class="quick-action-btn btn-copy" data-copy-value="{{ order.address|e }}" onclick="copyToClipboard(this.dataset.copyValue, event)" title="Копировать">
+                                                            <i class="fas fa-copy"></i>
+                                                        </button>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <!-- Внутренний комментарий приёма (только для CRM) -->
                                             {% if order.comment %}
                                             <div class="compact-info-item" style="margin-top: 0.5rem; padding-top: 0.75rem; border-top: 2px solid rgba(229, 231, 235, 0.6);">
@@ -369,18 +365,6 @@
                                             <div class="compact-info-item highlight-item">
                                                 <span class="compact-label"><i class="fas fa-mobile-screen me-1"></i>Модель:</span>
                                                 <span class="compact-value fw-bold">{{ order.model or 'Не указана' }}</span>
-                                            </div>
-                                            <div class="compact-info-item highlight-item">
-                                                <span class="compact-label"><i class="fas fa-barcode me-1"></i>Серийный номер:</span>
-                                                <span class="compact-value">{{ order.serial_number or 'Не указан' }}</span>
-                                            </div>
-                                            <div class="compact-info-item highlight-item">
-                                                <span class="compact-label"><i class="fas fa-key me-1"></i>Пароль / код:</span>
-                                                {% if order.password %}
-                                                <span class="compact-value font-monospace">{{ order.password }}</span>
-                                                {% else %}
-                                                <span class="compact-value text-muted">Не указан</span>
-                                                {% endif %}
                                             </div>
                                             {% if order.device_id %}
                                             <div class="compact-info-item highlight-item">
@@ -978,61 +962,6 @@
                         
                         <!-- Вкладка: История -->
                         <div class="tab-pane fade" id="history-pane" role="tabpanel" aria-labelledby="history-tab">
-                            <div class="mb-4" id="orderCustomerEmails">
-                                <h6 class="mb-2">
-                                    <i class="fas fa-envelope me-1"></i>Письма клиенту
-                                    {% if customer_emails %}
-                                    <span class="badge bg-secondary">{{ customer_emails|length }}</span>
-                                    {% endif %}
-                                </h6>
-                                {% if not order.email %}
-                                <p class="text-muted small mb-0">У клиента не указана почта — письма о заявке не отправляются. Добавьте email в карточке клиента.</p>
-                                {% elif customer_emails %}
-                                <div class="table-responsive">
-                                    <table class="table table-sm mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th style="width: 120px;">Дата</th>
-                                                <th style="width: 80px;">Время</th>
-                                                <th>Письмо</th>
-                                                <th>Кому</th>
-                                                <th style="width: 140px;">Результат</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for mail in customer_emails %}
-                                            <tr>
-                                                <td><small>{{ mail.date_str or '—' }}</small></td>
-                                                <td><small class="text-muted">{{ mail.time_str or '—' }}</small></td>
-                                                <td>
-                                                    <div class="fw-semibold" style="font-size: 0.9rem;">{{ mail.title }}</div>
-                                                    {% if mail.subject %}
-                                                    <small class="text-muted">{{ mail.subject }}</small>
-                                                    {% endif %}
-                                                    {% if mail.status_name %}
-                                                    <div><small class="text-muted">Статус: {{ mail.status_name }}</small></div>
-                                                    {% endif %}
-                                                    {% if mail.error_message %}
-                                                    <div><small class="text-danger">{{ mail.error_message }}</small></div>
-                                                    {% endif %}
-                                                </td>
-                                                <td><small>{{ mail.recipient_email }}</small></td>
-                                                <td>
-                                                    {% if mail.success %}
-                                                    <span class="badge bg-success">Отправлено</span>
-                                                    {% else %}
-                                                    <span class="badge bg-warning text-dark">Не ушло</span>
-                                                    {% endif %}
-                                                </td>
-                                            </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
-                                {% else %}
-                                <p class="text-muted small mb-0">Пока нет записей. Сюда попадают письмо «Заказ принят», письма после смены статуса, «Заказ готов» и «Заказ закрыт». Старые отправки до этого обновления здесь не видны.</p>
-                                {% endif %}
-                            </div>
                             <h6 class="mb-2"><i class="fas fa-history me-1"></i>События заявки</h6>
                             {% if order_history %}
                             <div class="table-responsive">
@@ -1303,9 +1232,6 @@
                                     {% if order.phone_display or order.phone %}
                                         | {{ order.phone_display or order.phone }}
                                     {% endif %}
-                                    {% if order.email %}
-                                        | {{ order.email }}
-                                    {% endif %}
                                 </div>
                                 <a href="{{ url_for('customers.client_detail', client_id=customer.id) }}" class="btn btn-sm btn-outline-primary">
                                     <i class="fas fa-external-link-alt me-1"></i>Редактировать клиента
@@ -1318,11 +1244,6 @@
                             <strong>Внимание:</strong> Клиент не найден. Данные клиента недоступны для редактирования.
                         </div>
                         {% endif %}
-                        
-                        <!-- Скрытые поля для обратной совместимости (если нужно сохранить данные клиента) -->
-                        <input type="hidden" name="client_name" value="{{ order.client_name }}">
-                        <input type="hidden" name="phone" value="{{ order.phone_display or order.phone }}">
-                        <input type="hidden" name="email" value="{{ order.email or '' }}">
                         
                         <div class="row g-3">
                             <div class="col-md-4">
@@ -1342,10 +1263,10 @@
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Серийный номер</label>
-                                <input type="text" class="form-control" name="serial_number" value="{{ order.serial_number or '' }}">
+                                <label class="form-label">Адрес</label>
+                                <input type="text" class="form-control" name="address" value="{{ order.address or '' }}" autocomplete="street-address">
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label class="form-label">Модель</label>
                                 <select class="form-control" id="editModel" name="model" data-initial="{{ order.model or '' }}">
                                     <option value="">Выберите или введите модель...</option>
@@ -1373,18 +1294,13 @@
                                 </select>
                                 <input type="hidden" name="appearance" id="editAppearanceInput" value="{{ order.appearance or '' }}">
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label class="form-label">Предварительная стоимость ({{ money_symbol }})</label>
                                 <input type="number" class="form-control" name="estimated_cost" value="{{ order.estimated_cost or 0 }}" min="0" step="1">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Предоплата ({{ money_symbol }})</label>
                                 <input type="number" class="form-control" name="prepayment" value="{{ order.prepayment }}" min="0" step="1" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Пароль устройства</label>
-                                <input type="password" class="form-control" id="devicePassword" name="device_password"
-                                       value="{{ order.password or '' }}" autocomplete="new-password" inputmode="text">
                             </div>
                             <!-- Статус убран из формы редактирования - используется выпадающий список в интерфейсе -->
                             <input type="hidden" name="status" value="{{ order.status_id or '' }}">

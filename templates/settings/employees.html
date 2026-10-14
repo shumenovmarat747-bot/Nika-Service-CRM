@@ -158,7 +158,7 @@
                         <thead>
                             <tr>
                                 <th>ФИО</th>
-                                <th>Логин (Email)</th>
+                                <th>Логин</th>
                                 <th>Статус</th>
                                 <th>Последний вход</th>
                                 <th style="width: 150px;">Действия</th>
@@ -178,7 +178,7 @@
                         <thead>
                             <tr>
                                 <th>ФИО</th>
-                                <th>Логин (Email)</th>
+                                <th>Логин</th>
                                 <th>Правило зарплаты</th>
                                 <th>Статус</th>
                                 <th style="width: 150px;">Действия</th>
@@ -198,7 +198,7 @@
                         <thead>
                             <tr>
                                 <th>ФИО</th>
-                                <th>Логин (Email)</th>
+                                <th>Логин</th>
                                 <th>Правило зарплаты</th>
                                 <th>Статус</th>
                                 <th style="width: 150px;">Действия</th>
@@ -235,10 +235,11 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="employeeLogin" class="form-label">Логин (Email) *</label>
-                        <input type="email" class="form-control" id="employeeLogin" required
-                               placeholder="user@example.com">
-                        <small class="text-muted">Используется для входа в систему и уведомлений</small>
+                        <label for="employeeLogin" class="form-label">Логин *</label>
+                        <input type="text" class="form-control" id="employeeLogin" required
+                               minlength="3" maxlength="64" pattern="[A-Za-zА-Яа-яЁё0-9._@+\-]+"
+                               autocomplete="username" placeholder="master1">
+                        <small class="text-muted">От 3 символов, без пробелов. Используется для входа в систему.</small>
                     </div>
 
                     <div class="mb-3">
@@ -514,6 +515,8 @@ function openEmployeeModal() {
     document.getElementById('employeeId').value = '';
     document.getElementById('employeeType').value = '';
     document.getElementById('employeeActive').checked = true;
+    document.getElementById('employeePassword').required = true;
+    document.getElementById('employeeRole').disabled = false;
     document.getElementById('passwordRequired').style.display = 'inline';
     document.getElementById('passwordHint').textContent = 'Минимум 6 символов';
     

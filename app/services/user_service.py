@@ -181,7 +181,7 @@ class UserService:
         Создает нового пользователя.
         
         Args:
-            username: Имя пользователя (email для входа)
+            username: Логин для входа
             password: Пароль
             role: Роль пользователя (viewer, master, manager, admin)
             display_name: Отображаемое имя (ФИО), если не указано - используется username
@@ -189,8 +189,8 @@ class UserService:
         Returns:
             ID созданного пользователя или None
         """
-        if not username or not username.strip():
-            raise ValidationError("Имя пользователя обязательно")
+        from app.utils.validators import validate_login
+        username = validate_login(username)
         
         from app.utils.validators import validate_new_password
         validate_new_password(password)
@@ -202,7 +202,7 @@ class UserService:
         
         # Если display_name не указан, используем username
         if not display_name or not display_name.strip():
-            display_name = username.strip()
+            display_name = username
         
         try:
             with get_db_connection() as conn:
@@ -210,7 +210,7 @@ class UserService:
                 cursor.execute('''
                     INSERT INTO users (username, password_hash, role, display_name, created_at, is_active)
                     VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, 1)
-                ''', (username.strip(), password_hash, role, display_name.strip()))
+                ''', (username, password_hash, role, display_name.strip()))
                 conn.commit()
                 user_id_new = cursor.lastrowid
                 
@@ -238,11 +238,11 @@ class UserService:
                         entity_type='user',
                         entity_id=user_id_new,
                         details={
-                            'username': username.strip(),
+                            'username': username,
                             'role': role
                         }
                     )
-                    logger.info(f"Создание пользователя залогировано: {username.strip()} (ID: {user_id_new})")
+                    logger.info(f"Создание пользователя залогировано: {username} (ID: {user_id_new})")
                 except Exception as e:
                     logger.error(f"Не удалось залогировать создание пользователя: {e}", exc_info=True)
                 
@@ -503,10 +503,10 @@ class UserService:
         params = []
         
         if username is not None:
-            if not username.strip():
-                raise ValidationError("Имя пользователя не может быть пустым")
+            from app.utils.validators import validate_login
+            username = validate_login(username)
             updates.append("username = ?")
-            params.append(username.strip())
+            params.append(username)
         
         if role is not None:
             if role not in ['viewer', 'master', 'manager', 'admin']:

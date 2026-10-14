@@ -117,8 +117,7 @@ class OrderQueries:
                             COALESCE(o.order_id, ''),
                             COALESCE(c.name, ''),
                             COALESCE(c.phone, ''),
-                            COALESCE(c.email, ''),
-                            COALESCE(d.serial_number, ''),
+                            COALESCE(o.address, ''),
                             COALESCE(dt.name, ''),
                             COALESCE(db.name, ''),
                             COALESCE(o.comment, ''),
@@ -144,9 +143,8 @@ class OrderQueries:
             like_conditions = [
                 'c.name LIKE ?',
                 f'({phone_or})',
-                'c.email LIKE ?',
+                'o.address LIKE ?',
                 'o.order_id LIKE ?',
-                'd.serial_number LIKE ?',
                 'o.comment LIKE ?',
                 'o.symptom_tags LIKE ?',
                 'EXISTS(SELECT 1 FROM order_symptoms osymp JOIN symptoms s ON s.id = osymp.symptom_id WHERE osymp.order_id = o.id AND s.name LIKE ?)',
@@ -280,7 +278,7 @@ class OrderQueries:
                 - device_id: ID устройства (int)
                 - manager_id: ID менеджера (int)
                 - master_id: ID мастера (int)
-                - search: поисковый запрос (str) - поиск по имени клиента, телефону, email, UUID заявки, серийному номеру, комментарию, неисправности (symptom_tags), внешнему виду (appearance), статусу, типу устройства, модели/бренду устройства, менеджеру, мастеру
+                - search: поисковый запрос (str) - поиск по имени клиента, телефону, адресу, UUID заявки, комментарию, неисправности (symptom_tags), внешнему виду (appearance), статусу, типу устройства, модели/бренду устройства, менеджеру, мастеру
                 - date_from: дата начала (str, формат YYYY-MM-DD)
                 - date_to: дата окончания (str, формат YYYY-MM-DD)
             page: Номер страницы
@@ -405,6 +403,7 @@ class OrderQueries:
                         COALESCE(os.name, o.status) AS status_name,
                         COALESCE(os.color, '#6c757d') AS status_color,
                         o.comment,
+                        o.address,
                         o.prepayment,
                         o.prepayment_cents,
                         -- Нормализованные данные (приоритет)
@@ -428,8 +427,6 @@ class OrderQueries:
                         o.updated_at,
                         c.name AS client_name,
                         c.phone,
-                        c.email,
-                        d.serial_number,
                         COALESCE(dt.name, '—') AS device_type,
                         COALESCE(db.name, '—') AS device_brand,
                         COALESCE(mgr.name, '—') AS manager_name,
@@ -941,8 +938,6 @@ class OrderQueries:
                         ) AS appearance,
                         c.name AS customer_name,
                         c.phone AS customer_phone,
-                        c.email AS customer_email,
-                        d.serial_number,
                         d.device_type_id,
                         d.device_brand_id,
                         dt.name AS device_type_name,

@@ -388,7 +388,15 @@ def api_lookup_customer():
         
         devices = DeviceService.get_customer_devices(customer.id)
         customer_dict = customer.to_dict()
-        devices_list = [d.to_dict() for d in devices]
+        # Этот endpoint заполняет форму новой заявки: старые чувствительные поля
+        # процесса приёмки сюда больше не передаём.
+        customer_dict.pop('email', None)
+        devices_list = []
+        for device in devices:
+            device_dict = device.to_dict()
+            device_dict.pop('serial_number', None)
+            device_dict.pop('password', None)
+            devices_list.append(device_dict)
         
         return jsonify({
             'success': True,

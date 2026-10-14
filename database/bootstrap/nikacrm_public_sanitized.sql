@@ -1041,6 +1041,7 @@ CREATE TABLE public.orders (
     status text DEFAULT 'new'::text,
     prepayment text DEFAULT '0'::text NOT NULL,
     estimated_cost text DEFAULT '0'::text,
+    address text,
     password text,
     appearance text,
     comment text,
@@ -3017,7 +3018,7 @@ COPY public.order_visibility_history (id, order_id, hidden, changed_by, changed_
 -- Data for Name: orders; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.orders (id, order_id, device_id, customer_id, manager_id, master_id, status, prepayment, password, appearance, comment, created_at, updated_at, symptom_tags, intake_checklist, status_id, hidden, model, model_id, prepayment_cents, is_deleted, deleted_at, deleted_by_id, deleted_reason) FROM stdin;
+COPY public.orders (id, order_id, device_id, customer_id, manager_id, master_id, status, prepayment, estimated_cost, address, password, appearance, comment, created_at, updated_at, symptom_tags, intake_checklist, status_id, hidden, model, model_id, prepayment_cents, is_deleted, deleted_at, deleted_by_id, deleted_reason) FROM stdin;
 \.
 
 
@@ -3225,6 +3226,7 @@ COPY public.schema_migrations_pg (version, name, applied_at) FROM stdin;
 023	diagnostics_templates_seed	2026-08-22 00:00:00
 024	order_customer_emails	2026-08-22 00:00:00
 025	locale_settings	2026-08-24 00:00:00
+026	order_address	2026-10-13 00:00:00
 \.
 
 

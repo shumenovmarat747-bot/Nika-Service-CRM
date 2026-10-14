@@ -64,14 +64,14 @@ def create_manager():
         
         data = request.get_json() or {}
         name = data.get('name')  # ФИО
-        login = data.get('login') or data.get('username')  # Email для входа
+        login = data.get('login') or data.get('username')
         password = data.get('password')
         
         if not name:
             return jsonify({'success': False, 'error': 'ФИО обязательно'}), 400
         
         if not login:
-            return jsonify({'success': False, 'error': 'Логин (Email) обязателен'}), 400
+            return jsonify({'success': False, 'error': 'Логин обязателен'}), 400
         
         if not password:
             return jsonify({'success': False, 'error': 'Пароль обязателен'}), 400
@@ -109,7 +109,7 @@ def create_manager():
             UserService.create_role(custom_role_name, permission_ids)
             logger.info(f"Создана кастомная роль {custom_role_name} с правами: {permission_ids}")
             
-            # Создаем пользователя с логином (email) и стандартной ролью (чтобы обойти валидацию)
+            # Создаем пользователя с логином и стандартной ролью (чтобы обойти валидацию)
             user_id = UserService.create_user(username=login, password=password, role='manager')
             
             # Обновляем роль на кастомную

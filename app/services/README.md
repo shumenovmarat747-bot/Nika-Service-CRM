@@ -183,7 +183,9 @@ from app.services import OrderService, CustomerService
 order = OrderService.create_order(
     customer_name='Иван Иванов',
     phone='+79991234567',
+    address='Екатеринбург, ул. Малышева, 10',
     device_type_id=1,
+    device_brand_id=1,
     manager_id=1
 )
 

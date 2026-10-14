@@ -824,10 +824,10 @@
                                         <div class="small text-muted mb-2">
                                             <strong>Организация:</strong> <code>##COMPANY_NAME##</code> <code>##branch.address##</code> <code>##branch.phone##</code> <code>##COMPANY_REQUISITES##</code> <code>##COMPANY_LOGO_URL##</code> <code>##COMPANY_LOGO_STYLE##</code><br>
                                             <strong>Заявка:</strong> <code>##ORDER_NUMBER##</code> <code>##ORDER_ID##</code> <code>##ORDER_UUID##</code> <code>##STATUS_NAME##</code> <code>##CREATED_AT##</code> <code>##DATE_TODAY##</code> <code>##TIME_NOW##</code><br>
-                                            <strong>Клиент:</strong> <code>##CLIENT_NAME##</code> <code>##CLIENT_PHONE1##</code> <code>##CLIENT_PHONE##</code> <code>##CLIENT_EMAIL##</code><br>
+                                            <strong>Клиент:</strong> <code>##CLIENT_NAME##</code> <code>##CLIENT_PHONE1##</code> <code>##CLIENT_PHONE##</code> <code>##ADDRESS##</code><br>
                                             <strong>Финансы:</strong> <code>##TOTAL_PAID##</code> <code>##total.paid.words##</code> <code>##PREPAYMENT##</code> <code>##PREPAYMENT_WORDS##</code> <code>##CURRENCY##</code><br>
                                             <strong>Ответственные:</strong> <code>##ENGINEER_NAME##</code> <code>##MASTER_NAME##</code> <code>##MANAGER_NAME##</code> <code>##EMPLOYEE_NAME##</code><br>
-                                            <strong>Устройство/заявка:</strong> <code>##MODEL##</code> <code>##DEVICE_TYPE##</code> <code>##DEVICE_BRAND##</code> <code>##SERIAL_NUMBER##</code> <code>##SYMPTOM_TAGS##</code> <code>##APPEARANCE##</code> <code>##PASSWORD##</code> <code>##COMMENT##</code>; <strong>QR/штрихкод:</strong> <code>##ticket.status.qrcode##</code> <code>##ticket.numberId.barcode##</code><br>
+                                            <strong>Устройство/заявка:</strong> <code>##MODEL##</code> <code>##DEVICE_TYPE##</code> <code>##DEVICE_BRAND##</code> <code>##SYMPTOM_TAGS##</code> <code>##APPEARANCE##</code> <code>##COMMENT##</code>; <strong>QR/штрихкод:</strong> <code>##ticket.status.qrcode##</code> <code>##ticket.numberId.barcode##</code><br>
                                             <strong>Строки чека:</strong> цикл <code>&lt;tr data-for="ITEMS"&gt;...&lt;/tr&gt;</code> — внутри: <code>##INDEX##</code> <code>##ITEM_NAME##</code> <code>##ITEM_SKU##</code> <code>##ITEM_WARRANTY##</code> <code>##ITEM_PRICE##</code> <code>##ITEM_DISCOUNT##</code> <code>##ITEM_QUANTITY##</code> <code>##ITEM_SUM##</code>; итого <code>##TOTAL_ITEMS##</code>
                                         </div>
                                     </div>
@@ -855,10 +855,10 @@
                                         <strong>Доступные теги</strong> (как в квитанции для клиента):<br>
                                         Организация: <code>##COMPANY_NAME##</code> <code>##branch.address##</code> <code>##branch.phone##</code> <code>##COMPANY_REQUISITES##</code> <code>##COMPANY_LOGO_URL##</code> <code>##COMPANY_LOGO_STYLE##</code> &bull;
                                         Заявка: <code>##ORDER_NUMBER##</code> <code>##ORDER_ID##</code> <code>##ORDER_UUID##</code> <code>##STATUS_NAME##</code> <code>##CREATED_AT##</code> <code>##DATE_TODAY##</code> <code>##TIME_NOW##</code> &bull;
-                                        Клиент: <code>##CLIENT_NAME##</code> <code>##CLIENT_PHONE1##</code> <code>##CLIENT_PHONE##</code> <code>##CLIENT_EMAIL##</code> &bull;
+                                        Клиент: <code>##CLIENT_NAME##</code> <code>##CLIENT_PHONE1##</code> <code>##CLIENT_PHONE##</code> <code>##ADDRESS##</code> &bull;
                                         Финансы: <code>##TOTAL_PAID##</code> <code>##total.paid.words##</code> <code>##PREPAYMENT##</code> <code>##PREPAYMENT_WORDS##</code> <code>##CURRENCY##</code> &bull;
                                         Ответственные: <code>##ENGINEER_NAME##</code> <code>##MASTER_NAME##</code> <code>##MANAGER_NAME##</code> <code>##EMPLOYEE_NAME##</code> &bull;
-                                        Устройство: <code>##MODEL##</code> <code>##DEVICE_TYPE##</code> <code>##DEVICE_BRAND##</code> <code>##SERIAL_NUMBER##</code> <code>##SYMPTOM_TAGS##</code> <code>##APPEARANCE##</code> <code>##PASSWORD##</code> <code>##COMMENT##</code> &bull;
+                                        Устройство: <code>##MODEL##</code> <code>##DEVICE_TYPE##</code> <code>##DEVICE_BRAND##</code> <code>##SYMPTOM_TAGS##</code> <code>##APPEARANCE##</code> <code>##COMMENT##</code> &bull;
                                         Строки чека: <code>&lt;tr data-for="ITEMS"&gt;</code> → <code>##INDEX##</code> <code>##ITEM_NAME##</code> <code>##ITEM_SKU##</code> <code>##ITEM_PRICE##</code> <code>##ITEM_QUANTITY##</code> <code>##ITEM_SUM##</code>, итого <code>##TOTAL_ITEMS##</code>
                                     </div>
                                     <div class="mb-3">
@@ -882,10 +882,10 @@
                                         <strong>Доступные теги</strong> (как в квитанции для клиента):<br>
                                         Организация: <code>##COMPANY_NAME##</code> <code>##branch.address##</code> <code>##branch.phone##</code> <code>##COMPANY_REQUISITES##</code> <code>##COMPANY_LOGO_URL##</code> <code>##COMPANY_LOGO_STYLE##</code> &bull;
                                         Заявка: <code>##ORDER_NUMBER##</code> <code>##ORDER_ID##</code> <code>##ORDER_UUID##</code> <code>##STATUS_NAME##</code> <code>##CREATED_AT##</code> <code>##DATE_TODAY##</code> <code>##TIME_NOW##</code> &bull;
-                                        Клиент: <code>##CLIENT_NAME##</code> <code>##CLIENT_PHONE1##</code> <code>##CLIENT_PHONE##</code> <code>##CLIENT_EMAIL##</code> &bull;
+                                        Клиент: <code>##CLIENT_NAME##</code> <code>##CLIENT_PHONE1##</code> <code>##CLIENT_PHONE##</code> <code>##ADDRESS##</code> &bull;
                                         Финансы: <code>##TOTAL_PAID##</code> <code>##total.paid.words##</code> <code>##PREPAYMENT##</code> <code>##PREPAYMENT_WORDS##</code> <code>##CURRENCY##</code> &bull;
                                         Ответственные: <code>##ENGINEER_NAME##</code> <code>##MASTER_NAME##</code> <code>##MANAGER_NAME##</code> <code>##EMPLOYEE_NAME##</code> &bull;
-                                        Устройство: <code>##MODEL##</code> <code>##DEVICE_TYPE##</code> <code>##DEVICE_BRAND##</code> <code>##SERIAL_NUMBER##</code> <code>##SYMPTOM_TAGS##</code> <code>##APPEARANCE##</code> <code>##PASSWORD##</code> <code>##COMMENT##</code> &bull;
+                                        Устройство: <code>##MODEL##</code> <code>##DEVICE_TYPE##</code> <code>##DEVICE_BRAND##</code> <code>##SYMPTOM_TAGS##</code> <code>##APPEARANCE##</code> <code>##COMMENT##</code> &bull;
                                         Строки: <code>&lt;tr data-for="ITEMS"&gt;</code> → <code>##INDEX##</code> <code>##ITEM_NAME##</code> <code>##ITEM_SKU##</code> <code>##ITEM_PRICE##</code> <code>##ITEM_QUANTITY##</code> <code>##ITEM_SUM##</code>, итого <code>##TOTAL_ITEMS##</code>
                                     </div>
                                     <div class="mb-3">
@@ -3386,7 +3386,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="mb-3">
                         <label for="masterName" class="form-label">ФИО <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="masterName" required>
-                        <div class="form-text">Будет использовано как имя пользователя для входа в систему</div>
+                        <div class="form-text">Имя мастера, которое будет видно в заявках</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="masterLogin" class="form-label">Логин <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="masterLogin" required minlength="3" maxlength="64"
+                               pattern="[A-Za-zА-Яа-яЁё0-9._@+\-]+" autocomplete="username" placeholder="master1">
+                        <div class="form-text">Можно использовать обычный логин без email, например <strong>master1</strong></div>
                     </div>
 
                     <div class="mb-3" id="masterPasswordGroup">
@@ -4009,7 +4016,7 @@ let editingPartId = null;
                     <li><code>##CLIENT_NAME##</code> — имя</li>
                     <li><code>##CLIENT_PHONE1##</code> — телефон (форматир.)</li>
                     <li><code>##CLIENT_PHONE##</code> — телефон (сырой)</li>
-                    <li><code>##CLIENT_EMAIL##</code> — email</li>
+                    <li><code>##ADDRESS##</code> — адрес заявки</li>
                 </ul>
             </div>
             <div class="col-md-4">
@@ -4039,10 +4046,8 @@ let editingPartId = null;
                     <li><code>##MODEL##</code> — модель устройства</li>
                     <li><code>##DEVICE_TYPE##</code> — тип устройства</li>
                     <li><code>##DEVICE_BRAND##</code> — бренд</li>
-                    <li><code>##SERIAL_NUMBER##</code> — серийный номер</li>
                     <li><code>##SYMPTOM_TAGS##</code> — неисправности</li>
                     <li><code>##APPEARANCE##</code> — внешний вид / комплектация</li>
-                    <li><code>##PASSWORD##</code> — пароль/код устройства (осторожно на клиентских бланках)</li>
                     <li><code>##COMMENT##</code> — внутренний комментарий к заявке</li>
                     <li><code>##ticket.status.qrcode##</code> — URL для QR (страница заявки)</li>
                     <li><code>##ticket.numberId.barcode##</code> — номер/UUID для штрихкода</li>
@@ -4113,7 +4118,7 @@ let editingPartId = null;
             CLIENT_NAME: 'Тест Клиент',
             CLIENT_PHONE1: '+7 (900) 123-45-67',
             CLIENT_PHONE: '+79001234567',
-            CLIENT_EMAIL: 'client@example.com',
+            ADDRESS: 'Екатеринбург, ул. Малышева, 10',
             TOTAL_PAID: '287399.65',
             'total.paid.words': {{ 287399.65|money_words|tojson }},
             PREPAYMENT: '1000.00',
@@ -4852,6 +4857,7 @@ let editingPartId = null;
                 .then(data => {
                     if (data.success && data.master) {
                         document.getElementById('masterName').value = data.master.name || '';
+                        document.getElementById('masterLogin').value = data.master.login || '';
                         document.getElementById('masterSalaryRuleType').value = data.master.salary_rule_type || '';
                         document.getElementById('masterSalaryRuleValue').value = data.master.salary_rule_value || '';
                         document.getElementById('masterActive').checked = data.master.active !== 0;
@@ -4897,10 +4903,16 @@ let editingPartId = null;
 
     function saveMaster() {
         const name = document.getElementById('masterName').value.trim();
+        const login = document.getElementById('masterLogin').value.trim();
         const password = document.getElementById('masterPassword').value;
 
         if (!name) {
             alert('ФИО обязательно');
+            return;
+        }
+
+        if (!login) {
+            alert('Логин обязателен');
             return;
         }
 
@@ -4915,6 +4927,7 @@ let editingPartId = null;
 
         const data = {
             name: name,
+            login: login,
             password: password || null,  // Пароль только при создании
             permission_ids: permissionIds,  // Выбранные права (всегда массив, даже если пустой)
             salary_rule_type: document.getElementById('masterSalaryRuleType').value || null,

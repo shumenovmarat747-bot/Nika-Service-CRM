@@ -30,7 +30,7 @@ from app.utils.exceptions import ValidationError, NotFoundError, DatabaseError
 from app.utils.datetime_utils import get_moscow_now, get_moscow_now_str, get_moscow_now_naive, convert_to_moscow
 from app.utils.cache import clear_cache, cache_result
 from app.utils.error_handlers import api_internal_error
-from app.database.connection import get_db_connection
+from app.database.connection import get_db_connection, _get_db_driver
 from app.database.queries.order_queries import OrderQueries
 from app.database.queries.warehouse_queries import WarehouseQueries
 from app.utils.safe_http_fetch import fetch_public_http
@@ -221,16 +221,13 @@ def _format_customer_search_date_label(val) -> Optional[str]:
 
 
 def _format_add_order_device_line(
-    device_type: str, device_brand: str, model: str, serial_number: str,
+    device_type: str, device_brand: str, model: str,
 ) -> str:
     parts = [p.strip() for p in (device_type or '', device_brand or '') if (p or '').strip()]
     line = ' '.join(parts)
     m = (model or '').strip()
     if m:
         line = f'{line} {m}'.strip() if line else m
-    sn = (serial_number or '').strip()
-    if sn:
-        line = f'{line} №{sn}'.strip() if line else f'№{sn}'
     return line or '—'
 
 
@@ -262,8 +259,7 @@ def _enrich_add_order_customer_search_rows(cursor, customers: list) -> None:
         SELECT o.customer_id, o.created_at, o.device_id,
                COALESCE(dt.name, '') AS device_type,
                COALESCE(db.name, '') AS device_brand,
-               COALESCE(NULLIF(TRIM(COALESCE(o.model, '')), ''), '') AS model,
-               COALESCE(d.serial_number, '') AS serial_number
+               COALESCE(NULLIF(TRIM(COALESCE(o.model, '')), ''), '') AS model
         FROM orders o
         JOIN devices d ON d.id = o.device_id
         LEFT JOIN device_types dt ON dt.id = d.device_type_id
@@ -280,15 +276,15 @@ def _enrich_add_order_customer_search_rows(cursor, customers: list) -> None:
     devices_by_customer = defaultdict(list)
     seen_device = defaultdict(set)
     for row in cursor.fetchall():
-        cid, _created_at, dev_id, dt_name, db_name, model, sn = (
-            row[0], row[1], row[2], row[3], row[4], row[5], row[6],
+        cid, _created_at, dev_id, dt_name, db_name, model = (
+            row[0], row[1], row[2], row[3], row[4], row[5],
         )
         if len(devices_by_customer[cid]) >= 3:
             continue
         if dev_id is None or dev_id in seen_device[cid]:
             continue
         seen_device[cid].add(dev_id)
-        label = _format_add_order_device_line(dt_name, db_name, model, sn)
+        label = _format_add_order_device_line(dt_name, db_name, model)
         devices_by_customer[cid].append(label)
 
     for c in customers:
@@ -360,13 +356,7 @@ def add_order():
             if not phone or len(phone) < 10:
                 raise ValidationError("Неверный формат телефона")
             
-            email = request.form.get('email', '').strip()
-            if email:
-                from app.utils.validators import validate_email
-                try:
-                    email = validate_email(email)
-                except ValidationError as e:
-                    raise ValidationError(f"Неверный формат email: {e}")
+            address = request.form.get('address', '').strip()
             
             symptom_tags = request.form.get('symptom_tags', '').strip()
             comment = request.form.get('comment', '').strip()
@@ -395,7 +385,6 @@ def add_order():
             except (ValueError, TypeError):
                 raise ValidationError("Неверный формат бренда устройства")
             
-            serial_number = request.form.get('serial_number', '').strip()
             appearance = request.form.get('appearance', '').strip()
 
             # Предварительная стоимость (оценка, не касса)
@@ -415,7 +404,6 @@ def add_order():
             if prepayment_method not in ('cash', 'card', 'transfer'):
                 prepayment_method = 'cash'
             
-            password = request.form.get('device_password', '').strip()
             model_raw = request.form.get('model', '').strip()
             if not model_raw:
                 raise ValidationError("Модель устройства обязательна")
@@ -449,16 +437,14 @@ def add_order():
             result = OrderService.create_order(
                 customer_name=client_name,
                 phone=phone,
-                email=email,
+                address=address,
                 device_type_id=device_type_id,
                 device_brand_id=device_brand_id,
                 manager_id=manager_id,
                 master_id=master_id,
-                serial_number=serial_number if serial_number else None,
                 prepayment=prepayment,
                 prepayment_method=prepayment_method,
                 estimated_cost=estimated_cost,
-                password=password if password else None,
                 appearance=appearance if appearance else None,
                 comment=comment if comment else None,
                 symptom_tags=symptom_tags if symptom_tags else None,
@@ -480,8 +466,8 @@ def add_order():
                             NotificationService.send_customer_order_email(
                                 order_id=order_db_id,
                                 template_type='order_accepted',
-                customer_id=customer_id
-            )
+                                customer_id=customer_id,
+                            )
                             NotificationService.send_director_order_email(
                                 order_id=order_db_id,
                                 template_type='director_order_accepted',
@@ -1209,9 +1195,8 @@ def api_datatables_orders():
         col_parts_total = _format_money(totals.get('parts_total', 0))
         col_prepayment = _format_money(totals.get('prepayment', 0))
 
-        # col 16–20: серийный номер, email, комментарий, дата обновления, кол-во комментариев (скрыты по умолчанию)
-        col_serial_number = _html.escape(str(o.get('serial_number') or '—'))
-        col_email = _html.escape(str(o.get('email') or '—'))
+        # col 16–19: адрес, комментарий, дата обновления, кол-во комментариев (скрыты по умолчанию)
+        col_address = _html.escape(str(o.get('address') or '—'))
         comment_raw = (o.get('comment') or '').strip()
         col_comment = _html.escape(comment_raw[:50] + ('…' if len(comment_raw) > 50 else '')) if comment_raw else '—'
         col_updated_at = _format_date_full(o.get('updated_at') or '', with_time=True)
@@ -1236,8 +1221,7 @@ def api_datatables_orders():
             "services_total_col": col_services_total,
             "parts_total_col": col_parts_total,
             "prepayment_col": col_prepayment,
-            "serial_number_col": col_serial_number,
-            "email_col": col_email,
+            "address_col": col_address,
             "comment_col": col_comment,
             "updated_at_col": col_updated_at,
             "comments_count_col": col_comments_count,
@@ -1324,19 +1308,12 @@ def order_detail(order_id):
                         flash('Изменений не было.', 'info')
                     return redirect(url_for('orders.order_detail', order_id=order.order_id))
 
-                # Извлекаем данные из формы
-                # ВАЖНО: Поля клиента (client_name, phone, email) теперь скрыты в форме редактирования
-                # и должны редактироваться в разделе клиента. Но оставляем их для обратной совместимости.
-                client_name = request.form.get('client_name', '').strip()
-                phone_raw = request.form.get('phone', '').strip()
-                phone = normalize_phone(phone_raw) if phone_raw else None
-                email = request.form.get('email', '').strip() or None
-                
+                # Контакты клиента редактируются только в карточке клиента.
+                address = request.form.get('address', '').strip()
                 symptom_tags = request.form.get('symptom_tags', '').strip()
                 comment = request.form.get('comment', '').strip()
                 device_type_id = int(request.form['device_type'])
                 device_brand_id = int(request.form['device_brand'])
-                serial_number = request.form.get('serial_number', '').strip()
                 model = request.form.get('model', '').strip() or None
                 appearance = request.form.get('appearance', '').strip()
                 prepayment = parse_non_negative_money(
@@ -1350,33 +1327,17 @@ def order_detail(order_id):
                 # Храним как строку числа (как create_order / TEXT column)
                 prepayment = str(prepayment)
                 estimated_cost = str(estimated_cost)
-                password = (
-                    request.form.get('device_password', '').strip()
-                    or request.form.get('password', '').strip()
-                )
                 # Статус теперь не редактируется через форму - используется выпадающий список в интерфейсе
                 # Не обновляем статус через форму редактирования заявки
                 status_id = None  # Статус не обновляется через форму редактирования
                 old_manager_id_before = order_data['order'].get('manager_id')
                 old_master_id_before = order_data['order'].get('master_id')
                 
-                # Обновляем клиента только если данные клиента были переданы (для обратной совместимости)
-                # В новой версии формы эти поля скрыты, поэтому клиент не будет обновляться
-                if client_name and phone and order_data.get('customer') and order_data['customer'].get('id'):
-                    customer_data = {
-                        'name': client_name,
-                        'phone': phone,
-                        'email': email
-                    }
-                    CustomerService.update_customer(order_data['customer']['id'], customer_data)
-                
                 # Обновляем устройство
                 DeviceService.update_device(
                     order_data['device']['id'],
                     device_type_id=device_type_id,
                     device_brand_id=device_brand_id,
-                    serial_number=serial_number if serial_number else None,
-                    password=password if password else None,
                     symptom_tags=symptom_tags if symptom_tags else None,
                     appearance_tags=appearance if appearance else None
                 )
@@ -1422,7 +1383,7 @@ def order_detail(order_id):
                         'master_id = ?',
                         'prepayment = ?',
                         'prepayment_cents = COALESCE(?, prepayment_cents)',
-                        'password = ?',
+                        'address = ?',
                         'appearance = ?',
                         'comment = ?',
                         'symptom_tags = ?',
@@ -1435,7 +1396,7 @@ def order_detail(order_id):
                         master_id,
                         prepayment,
                         prepayment_cents,
-                        password if password else None,
+                        address or None,
                         appearance if appearance else None,
                         comment if comment else None,
                         symptom_tags if symptom_tags else None,
@@ -1647,18 +1608,14 @@ def order_detail(order_id):
                         changes['appearance'] = {'old': old_appearance_raw or '—', 'new': new_appearance_raw or '—'}
                         logger.debug(f"Обнаружено изменение appearance: '{old_appearance_raw}' -> '{new_appearance_raw}'")
                     
-                    old_password = order_data['order'].get('password') or ''
-                    if password != old_password:
-                        changes['password'] = {'old': '***' if old_password else '—', 'new': '***' if password else '—'}
+                    old_address = order_data['order'].get('address') or ''
+                    if address != old_address:
+                        changes['address'] = {'old': old_address or '—', 'new': address or '—'}
                     
                     old_comment = order_data['order'].get('comment') or ''
                     if comment != old_comment:
                         changes['comment'] = {'old': (old_comment[:50] + '...' if len(old_comment) > 50 else old_comment) or '—', 
                                               'new': (comment[:50] + '...' if len(comment) > 50 else comment) or '—'}
-                    
-                    old_serial = order_data['device'].get('serial_number') or ''
-                    if serial_number != old_serial:
-                        changes['serial_number'] = {'old': old_serial or '—', 'new': serial_number or '—'}
                     
                     old_device_type_id = order_data['device'].get('device_type_id')
                     # Нормализуем типы для сравнения
@@ -1689,19 +1646,6 @@ def order_detail(order_id):
                             'new': new_brand.get('name') if new_brand else '—'
                         }
                         logger.debug(f"Обнаружено изменение device_brand: '{old_brand.get('name') if old_brand else '—'}' -> '{new_brand.get('name') if new_brand else '—'}'")
-                    
-                    # Также логируем изменения клиента
-                    old_client_name = order_data['customer'].get('name') or ''
-                    if client_name != old_client_name:
-                        changes['client_name'] = {'old': old_client_name or '—', 'new': client_name}
-                    
-                    old_phone = order_data['customer'].get('phone') or ''
-                    if phone != old_phone:
-                        changes['phone'] = {'old': old_phone or '—', 'new': phone}
-                    
-                    old_email = order_data['customer'].get('email') or ''
-                    if email != old_email:
-                        changes['email'] = {'old': old_email or '—', 'new': email or '—'}
                     
                     # Фильтруем пустые изменения - проверяем, что есть реальные изменения
                     # Исключаем служебные поля и пустые значения
@@ -2216,22 +2160,22 @@ def order_detail(order_id):
                                     'username': username
                                 })
                     
-                    # Обработка изменения пароля
-                    if 'password' in details or 'Пароль' in details:
-                        password_info = details.get('password') or details.get('Пароль') or {}
-                        if isinstance(password_info, dict):
-                            old_val = password_info.get('old') or '—'
-                            new_val = password_info.get('new') or '—'
+                    # Обработка изменения адреса заявки
+                    if 'address' in details or 'Адрес' in details:
+                        address_info = details.get('address') or details.get('Адрес') or {}
+                        if isinstance(address_info, dict):
+                            old_val = address_info.get('old') or '—'
+                            new_val = address_info.get('new') or '—'
                             if old_val != new_val:
                                 order_history.append({
                                     'date_str': date_str,
                                     'time_str': time_str,
                                     'datetime': log_created_at,
-                                    'type': 'password_change',
-                                    'icon': 'key',
+                                    'type': 'address_change',
+                                    'icon': 'map-marker-alt',
                                     'color': 'secondary',
-                                    'title': 'Изменен пароль',
-                                    'description': 'Пароль изменен',
+                                    'title': 'Изменен адрес',
+                                    'description': f'С "{old_val}" на "{new_val}"',
                                     'username': username
                                 })
                     
@@ -2270,25 +2214,6 @@ def order_detail(order_id):
                                     'color': 'info',
                                     'title': 'Изменен комментарий',
                                     'description': f'Комментарий обновлен',
-                                    'username': username
-                                })
-                    
-                    # Обработка изменения серийного номера
-                    if 'serial_number' in details or 'Серийный номер' in details:
-                        serial_info = details.get('serial_number') or details.get('Серийный номер') or {}
-                        if isinstance(serial_info, dict):
-                            old_val = serial_info.get('old') or '—'
-                            new_val = serial_info.get('new') or '—'
-                            if old_val != new_val:
-                                order_history.append({
-                                    'date_str': date_str,
-                                    'time_str': time_str,
-                                    'datetime': log_created_at,
-                                    'type': 'serial_change',
-                                    'icon': 'barcode',
-                                    'color': 'secondary',
-                                    'title': 'Изменен серийный номер',
-                                    'description': f'С "{old_val}" на "{new_val}"',
                                     'username': username
                                 })
                     
@@ -2368,24 +2293,6 @@ def order_detail(order_id):
                                     'username': username
                                 })
                     
-                    # Обработка изменения email
-                    if 'email' in details or 'Email' in details:
-                        email_info = details.get('email') or details.get('Email') or {}
-                        if isinstance(email_info, dict):
-                            old_val = email_info.get('old') or '—'
-                            new_val = email_info.get('new') or '—'
-                            if old_val != new_val:
-                                order_history.append({
-                                    'date_str': date_str,
-                                    'time_str': time_str,
-                                    'datetime': log_created_at,
-                                    'type': 'email_change',
-                                    'icon': 'envelope',
-                                    'color': 'secondary',
-                                    'title': 'Изменен email',
-                                    'description': f'С "{old_val}" на "{new_val}"',
-                                'username': username
-                            })
                 elif action_type == 'add_payment':
                     amount = details.get('Сумма') or details.get('amount') or 0
                     payment_type = details.get('Тип оплаты') or details.get('payment_type') or 'Неизвестно'
@@ -2606,7 +2513,6 @@ def order_detail(order_id):
             order_models=[],
             order_history=order_history,  # История взаимодействий с заявкой
             history_has_more=history_has_more,
-            customer_emails=NotificationService.list_order_customer_emails(order.id),
             customer_template_rendered=customer_template_rendered,
             sales_receipt_template_rendered=sales_receipt_template_rendered,
             work_act_template_rendered=work_act_template_rendered,
@@ -2631,6 +2537,9 @@ def device_history(device_id):
     
     orders = DeviceService.get_device_orders(device_id)
     device_dict = device.to_dict()
+    # Поля старого процесса не показываем на следующих этапах заявки.
+    for legacy_field in ('serial_number', 'password', 'customer_email'):
+        device_dict.pop(legacy_field, None)
     
     if device_dict.get('customer_phone'):
         device_dict['customer_phone_display'] = format_phone_display(device_dict['customer_phone'])
@@ -2655,7 +2564,7 @@ def api_check_duplicate():
         
         data = request.get_json(silent=True) or {}
         phone = data.get('phone', '')
-        serial_number = data.get('serial_number')
+        address = (data.get('address') or '').strip()
         
         if not phone.strip():
             return jsonify({'success': False, 'error': 'phone_required'}), 400
@@ -2679,26 +2588,45 @@ def api_check_duplicate():
             
             customer_id = customer[0]
             
-            # Проверяем наличие заявок за последние 30 дней
+            # Проверяем наличие заявок за последние 30 дней.
             not_deleted_clause = _orders_not_deleted_clause(cursor)
-            if serial_number:
-                cursor.execute('''
-                    SELECT COUNT(*) FROM orders 
-                    WHERE customer_id = ? 
-                    AND device_id IN (SELECT id FROM devices WHERE serial_number = ?)
-                    AND created_at > datetime('now', '-30 days')
-                    AND (hidden = 0 OR hidden IS NULL)
-                ''' + not_deleted_clause, (customer_id, serial_number))
+            recent_condition = (
+                "o.created_at > CURRENT_TIMESTAMP - INTERVAL '30 days'"
+                if _get_db_driver() == 'postgres'
+                else "o.created_at > datetime('now', '-30 days')"
+            )
+            if address:
+                cursor.execute(f'''
+                    SELECT o.id, COALESCE(os.name, o.status) AS status
+                    FROM orders o
+                    LEFT JOIN order_statuses os ON os.id = o.status_id
+                    WHERE o.customer_id = ?
+                      AND LOWER(TRIM(COALESCE(o.address, ''))) = LOWER(TRIM(?))
+                      AND {recent_condition}
+                      AND (o.hidden = 0 OR o.hidden IS NULL)
+                ''' + not_deleted_clause + '''
+                    ORDER BY o.created_at DESC
+                    LIMIT 1
+                ''', (customer_id, address))
+                duplicate_kind = 'by_address'
             else:
-                cursor.execute('''
-                    SELECT COUNT(*) FROM orders 
-                    WHERE customer_id = ? 
-                    AND created_at > datetime('now', '-30 days')
-                    AND (hidden = 0 OR hidden IS NULL)
-                ''' + not_deleted_clause, (customer_id,))
-            
-            count = cursor.fetchone()[0]
-            result = count > 0
+                cursor.execute(f'''
+                    SELECT o.id, COALESCE(os.name, o.status) AS status
+                    FROM orders o
+                    LEFT JOIN order_statuses os ON os.id = o.status_id
+                    WHERE o.customer_id = ?
+                      AND {recent_condition}
+                      AND (o.hidden = 0 OR o.hidden IS NULL)
+                ''' + not_deleted_clause + '''
+                    ORDER BY o.created_at DESC
+                    LIMIT 1
+                ''', (customer_id,))
+                duplicate_kind = 'by_phone'
+
+            row = cursor.fetchone()
+            result = {}
+            if row:
+                result[duplicate_kind] = {'order_id': row[0], 'status': row[1] or '—'}
             
         return jsonify({'success': True, 'duplicates': result})
     except Exception as e:
@@ -4387,7 +4315,7 @@ def api_search_customers_for_order():
             cursor = conn.cursor()
 
             sql = """
-                SELECT id, name, phone, email
+                SELECT id, name, phone
                 FROM customers
                 WHERE LOWER(COALESCE(name, '')) LIKE ?
                    OR LOWER(COALESCE(name, '')) LIKE ?
@@ -4428,7 +4356,6 @@ def api_search_customers_for_order():
                     'name': row[1] or '',
                     'phone': phone,
                     'phone_display': format_phone_display(phone),
-                    'email': row[3] or '',
                 })
 
             _enrich_add_order_customer_search_rows(cursor, customers)

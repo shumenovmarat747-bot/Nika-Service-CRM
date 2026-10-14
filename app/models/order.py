@@ -28,6 +28,7 @@ class Order(BaseModel):
         status: Код статуса (legacy)
         prepayment: Предоплата
         estimated_cost: Предварительная стоимость (оценка, не касса)
+        address: Адрес выезда/приёма техники
         password: Пароль от устройства
         appearance: Внешний вид (текст, для обратной совместимости)
         comment: Комментарий
@@ -66,6 +67,7 @@ class Order(BaseModel):
         self.status_color = kwargs.get('status_color')
         self.prepayment = kwargs.get('prepayment', '0')
         self.estimated_cost = kwargs.get('estimated_cost', '0')
+        self.address = kwargs.get('address')
         self.password = kwargs.get('password')
         self.appearance = kwargs.get('appearance')
         self.comment = kwargs.get('comment')
@@ -291,6 +293,7 @@ class Order(BaseModel):
             'status_color': self.status_color,
             'prepayment': self.prepayment,
             'estimated_cost': self.estimated_cost,
+            'address': self.address,
             'password': self.password,
             'appearance': self.appearance,
             'comment': self.comment,

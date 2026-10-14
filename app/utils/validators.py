@@ -33,6 +33,22 @@ PASSWORD_MIN_LEN = 6
 PASSWORD_MAX_LEN = 256
 
 
+def validate_login(login: str) -> str:
+    """Логин сотрудника: не обязан быть email, но безопасен для ручного ввода."""
+    value = (login or "").strip()
+    if not value:
+        raise ValidationError("Логин обязателен")
+    if len(value) < 3:
+        raise ValidationError("Логин должен быть не менее 3 символов")
+    if len(value) > 64:
+        raise ValidationError("Логин должен быть не более 64 символов")
+    if not re.fullmatch(r"[\w.@+-]+", value, flags=re.UNICODE):
+        raise ValidationError(
+            "Логин может содержать буквы, цифры и символы . _ @ + - без пробелов"
+        )
+    return value
+
+
 def password_meets_policy(password: str) -> bool:
     """True if password length is allowed for create/change (server-side, not HTML)."""
     n = len(password or "")

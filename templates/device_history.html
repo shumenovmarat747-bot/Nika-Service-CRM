@@ -158,10 +158,6 @@
                                                 <strong><i class="fas fa-tag me-1"></i>Бренд:</strong><br>
                                                 <span>{{ device.device_brand or '—' }}</span>
                                             </div>
-                                            <div class="info-item mb-3">
-                                                <strong><i class="fas fa-barcode me-1"></i>Серийный номер:</strong><br>
-                                                <span>{{ device.serial_number or '—' }}</span>
-                                            </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="info-item mb-3">
@@ -200,19 +196,6 @@
                                                     {% endif %}
                                                 </div>
                                             </div>
-                                            {% if device.customer_email %}
-                                            <div class="info-item mb-3">
-                                                <strong><i class="fas fa-envelope me-1"></i>Email:</strong><br>
-                                                <div class="contact-item">
-                                                    <a href="mailto:{{ device.customer_email }}" class="contact-value">
-                                                        {{ device.customer_email }}
-                                                    </a>
-                                                    <button class="contact-btn" data-copy-value="{{ device.customer_email|e }}" onclick="copyToClipboard(this.dataset.copyValue, event)" title="Копировать">
-                                                        <i class="fas fa-copy"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            {% endif %}
                                             <div class="info-item mb-3">
                                                 <strong><i class="fas fa-calendar me-1"></i>Дата регистрации:</strong><br>
                                                 <span>{{ device.created_at|format_date(true) if device.created_at else '—' }}</span>
@@ -250,7 +233,7 @@
                                                     <th><i class="fas fa-money-bill-wave me-1"></i>Предоплата</th>
                                                     <th><i class="fas fa-wrench me-1"></i>Неисправность</th>
                                                     <th><i class="fas fa-paint-brush me-1"></i>Внешний вид</th>
-                                                    <th><i class="fas fa-key me-1"></i>Пароль</th>
+                                                    <th><i class="fas fa-map-marker-alt me-1"></i>Адрес</th>
                                                     <th><i class="fas fa-comment me-1"></i>Комментарий</th>
                                                     <th><i class="fas fa-cog me-1"></i>Услуги</th>
                                                     <th><i class="fas fa-box me-1"></i>Запчасти</th>
@@ -330,11 +313,7 @@
                                                         {% endif %}
                                                     </td>
                                                     <td>
-                                                        {% if order.password %}
-                                                            <span class="badge badge-warning">{{ order.password }}</span>
-                                                        {% else %}
-                                                            <span class="text-muted">—</span>
-                                                        {% endif %}
+                                                        {{ order.address or '—' }}
                                                     </td>
                                                     <td>
                                                         {% if order.comment %}

@@ -105,7 +105,8 @@ def render_order_print_templates(
                 or ""
             ),
             "CLIENT_PHONE": _safe(order_obj.get("phone") or customer_obj.get("phone") or ""),
-            "CLIENT_EMAIL": _safe(order_obj.get("email") or customer_obj.get("email") or ""),
+            "CLIENT_EMAIL": "",
+            "ADDRESS": _safe(order_obj.get("address") or ""),
             "TOTAL_PAID": _safe(
                 f"{totals.get('paid', 0):.2f}"
                 if isinstance(totals, dict) and totals.get("paid")
@@ -126,10 +127,10 @@ def render_order_print_templates(
             "COMMENT": _safe(order_obj.get("comment") or ""),
             "DEVICE_TYPE": _safe(order_obj.get("device_type_name") or device_obj.get("device_type") or ""),
             "DEVICE_BRAND": _safe(order_obj.get("device_brand_name") or device_obj.get("device_brand") or ""),
-            "SERIAL_NUMBER": _safe(order_obj.get("serial_number") or device_obj.get("serial_number") or ""),
+            "SERIAL_NUMBER": "",
             "SYMPTOM_TAGS": _safe(order_obj.get("symptom_tags") or ""),
             "APPEARANCE": _safe(order_obj.get("appearance") or ""),
-            "PASSWORD": _safe(order_obj.get("password") or ""),
+            "PASSWORD": "",
         }
 
         print_items = []
@@ -195,7 +196,7 @@ def render_order_print_templates(
         values.update({
             "701809f9-23dc-4346-aff4-0aef32523aef": _safe(order_obj.get("device_type_name") or device_obj.get("device_type") or ""),
             "b6a8f943-e1b0-46e8-a321-b25fcfaf6976": _safe(order_obj.get("device_brand_name") or device_obj.get("device_brand") or ""),
-            "c5286c7d-44aa-4579-8258-935b003998cf": _safe(order_obj.get("serial_number") or device_obj.get("serial_number") or ""),
+            "c5286c7d-44aa-4579-8258-935b003998cf": "",
             "c76b5bc7-7a68-4672-9542-cabaf2962600": _safe(order_obj.get("model") or ""),
             "bc1ae9b1-7b8b-4da6-add5-26982865629e": _safe(order_obj.get("appearance") or ""),
             "f93f4677-15b5-4e57-97e7-a345cb5b0e21": _safe(order_obj.get("symptom_tags") or ""),

@@ -26,12 +26,12 @@ def test_record_customer_email_uses_integer_success():
     assert "1 if success else 0" in src
 
 
-def test_order_detail_history_has_customer_emails_block():
+def test_order_detail_history_does_not_expose_customer_email_block():
     html = (Path(__file__).resolve().parents[1] / "templates" / "order_detail.html").read_text(
         encoding="utf-8"
     )
-    assert 'id="orderCustomerEmails"' in html
-    assert "Письма клиенту" in html
+    assert 'id="orderCustomerEmails"' not in html
+    assert "Письма клиенту" not in html
 
 
 def test_bootstrap_marks_024():

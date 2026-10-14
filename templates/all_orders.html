@@ -711,27 +711,22 @@
                                                 </li>
                                                 <li class="column-toggle-item">
                                                     <label class="mb-0" style="cursor: pointer;">
-                                                        <input type="checkbox" class="column-toggle" data-column="16"> Серийный №
+                                                        <input type="checkbox" class="column-toggle" data-column="16"> Адрес
                                                     </label>
                                                 </li>
                                                 <li class="column-toggle-item">
                                                     <label class="mb-0" style="cursor: pointer;">
-                                                        <input type="checkbox" class="column-toggle" data-column="17"> Email
+                                                        <input type="checkbox" class="column-toggle" data-column="17"> Комментарий
                                                     </label>
                                                 </li>
                                                 <li class="column-toggle-item">
                                                     <label class="mb-0" style="cursor: pointer;">
-                                                        <input type="checkbox" class="column-toggle" data-column="18"> Комментарий
+                                                        <input type="checkbox" class="column-toggle" data-column="18"> Обновлено
                                                     </label>
                                                 </li>
                                                 <li class="column-toggle-item">
                                                     <label class="mb-0" style="cursor: pointer;">
-                                                        <input type="checkbox" class="column-toggle" data-column="19"> Обновлено
-                                                    </label>
-                                                </li>
-                                                <li class="column-toggle-item">
-                                                    <label class="mb-0" style="cursor: pointer;">
-                                                        <input type="checkbox" class="column-toggle" data-column="20"> Коммент.
+                                                        <input type="checkbox" class="column-toggle" data-column="19"> Коммент.
                                                     </label>
                                                 </li>
                                             </ul>
@@ -761,8 +756,7 @@
                                                     <th><i class="fas fa-tools me-1"></i>Услуги</th>
                                                     <th><i class="fas fa-box me-1"></i>Запчасти</th>
                                                     <th><i class="fas fa-hand-holding-usd me-1"></i>Предоплата</th>
-                                                    <th><i class="fas fa-barcode me-1"></i>Серийный №</th>
-                                                    <th><i class="fas fa-envelope me-1"></i>Email</th>
+                                                    <th><i class="fas fa-map-marker-alt me-1"></i>Адрес</th>
                                                     <th><i class="fas fa-comment me-1"></i>Комментарий</th>
                                                     <th><i class="fas fa-edit me-1"></i>Обновлено</th>
                                                     <th><i class="fas fa-comments me-1"></i>Коммент.</th>
@@ -994,7 +988,6 @@
             const dataId = row.getAttribute('data-id');
             const orderId = row.getAttribute('data-order-id');
             const clientName = row.getAttribute('data-client-name');
-            const email = row.getAttribute('data-email');
             const phoneDisplay = row.getAttribute('data-phone-display') || row.getAttribute('data-phone');
             const deviceType = row.getAttribute('data-device-type');
             const deviceBrand = row.getAttribute('data-device-brand');
@@ -1004,19 +997,14 @@
             const symptomTags = row.getAttribute('data-symptom-tags');
             const appearance = row.getAttribute('data-appearance');
             const prepayment = row.getAttribute('data-prepayment');
-            const serialNumber = row.getAttribute('data-serial-number');
 
             // Заполняем карточку превью
             document.getElementById('previewTitle').textContent = `Заявка #${dataId}`;
             document.getElementById('previewClient').textContent = clientName || 'Не указан';
             document.getElementById('previewPhone').textContent = phoneDisplay || 'Не указан';
-            document.getElementById('previewEmail').textContent = email || 'Не указан';
             let deviceText = `${deviceType || ''} ${deviceBrand || ''}`.trim() || 'Не указано';
             if (model) {
                 deviceText += ` ${model}`;
-            }
-            if (serialNumber) {
-                deviceText += ` (S/N: ${serialNumber})`;
             }
             document.getElementById('previewDevice').textContent = deviceText;
             document.getElementById('previewManager').textContent = manager || 'Не назначен';
@@ -1265,10 +1253,10 @@
             }
             
             // Порядок колонок: загрузка из localStorage
-            var ORDERS_TABLE_COLUMN_COUNT = 21;
+            var ORDERS_TABLE_COLUMN_COUNT = 20;
             function getOrdersTableColumnOrder() {
                 try {
-                    var raw = localStorage.getItem('ordersTableColumnOrder');
+                    var raw = localStorage.getItem('ordersTableColumnOrderV2');
                     if (!raw) return null;
                     var order = JSON.parse(raw);
                     if (!Array.isArray(order) || order.length !== ORDERS_TABLE_COLUMN_COUNT) return null;
@@ -1288,7 +1276,7 @@
             function saveOrdersTableColumnOrder(order) {
                 try {
                     if (Array.isArray(order) && order.length === ORDERS_TABLE_COLUMN_COUNT) {
-                        localStorage.setItem('ordersTableColumnOrder', JSON.stringify(order));
+                        localStorage.setItem('ordersTableColumnOrderV2', JSON.stringify(order));
                     }
                 } catch (e) {}
             }
@@ -1318,16 +1306,16 @@
                 "deferRender": true,
                 "pageLength": 25,
                 "lengthMenu": [[10, 25, 50, 100], [10, 25, 50, 100]],
-                "order": [[19, "desc"]],
+                "order": [[18, "desc"]],
                 "stateSave": true,
                 "stateDuration": 60 * 60 * 24 * 7,
                 "stateLoadParams": function(settings, data) {
                     if (data && data.order) {
                         data.order = data.order.filter(function(o) {
                             var col = parseInt(o[0], 10);
-                            return col >= 0 && col <= 20;
+                            return col >= 0 && col <= 19;
                         });
-                        if (!data.order.length) data.order = [[19, "desc"]];
+                        if (!data.order.length) data.order = [[18, "desc"]];
                     }
                     // Поиск берём только из текущего поля/URL, а не из старого stateSave.
                     if (data && data.search) delete data.search;
@@ -1376,8 +1364,7 @@
                     { "data": "services_total_col" },
                     { "data": "parts_total_col" },
                     { "data": "prepayment_col" },
-                    { "data": "serial_number_col" },
-                    { "data": "email_col" },
+                    { "data": "address_col" },
                     { "data": "comment_col" },
                     { "data": "updated_at_col" },
                     { "data": "comments_count_col" }
@@ -1403,9 +1390,9 @@
                     };
                 },
                 "columnDefs": [
-                    { "targets": [0, 9, 19], "orderable": true },
-                    { "targets": [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20], "orderable": false },
-                    { "targets": [13, 14, 15, 16, 17, 18, 19, 20], "visible": false }
+                    { "targets": [0, 9, 18], "orderable": true },
+                    { "targets": [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 19], "orderable": false },
+                    { "targets": [13, 14, 15, 16, 17, 18, 19], "visible": false }
                 ],
                 "colReorder": {
                     "order": getOrdersTableColumnOrder(),
@@ -1799,7 +1786,7 @@
             
             if (columnToggles.length) {
                 // Загружаем сохраненные настройки колонок
-                const savedColumns = localStorage.getItem('ordersTableColumns');
+                const savedColumns = localStorage.getItem('ordersTableColumnsV2');
                 if (savedColumns) {
                     try {
                         const columns = JSON.parse(savedColumns);
@@ -1841,7 +1828,7 @@
                         const colIndex = parseInt(toggle.getAttribute('data-column'));
                         settings[colIndex] = toggle.checked;
                     });
-                    localStorage.setItem('ordersTableColumns', JSON.stringify(settings));
+                    localStorage.setItem('ordersTableColumnsV2', JSON.stringify(settings));
                 }
             }
             

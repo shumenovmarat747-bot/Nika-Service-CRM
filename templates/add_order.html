@@ -483,10 +483,9 @@
                                placeholder="{{ phone_prefix_plus }} ..." value="{{ phone_prefix_plus }}" required>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email"
-                               pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-                               placeholder="email@example.com" autocomplete="section-order email">
+                        <label for="address" class="form-label">Адрес</label>
+                        <input type="text" class="form-control" id="address" name="address"
+                               placeholder="Улица, дом, квартира" autocomplete="section-order street-address">
                     </div>
                 </div>
             </div>
@@ -495,7 +494,7 @@
             <div class="form-section">
                 <h5><i class="fas fa-laptop me-1"></i>2. Данные об устройстве</h5>
                 <div class="row g-3">
-                    <div class="col-md-3 required">
+                    <div class="col-md-4 required">
                         <label for="deviceType" class="form-label">Тип устройства</label>
                         <select class="form-control" name="device_type" id="deviceType" required>
                             <option value="">Выберите...</option>
@@ -504,7 +503,7 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="col-md-3 required">
+                    <div class="col-md-4 required">
                         <label for="deviceBrand" class="form-label">Бренд</label>
                         <select class="form-control" name="device_brand" id="deviceBrand" required>
                             <option value="">Выберите...</option>
@@ -513,17 +512,7 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="col-md-3">
-                        <label for="serialNumber" class="form-label">Серийный номер</label>
-                        <input type="text" class="form-control" id="serialNumber" name="serial_number"
-                               placeholder="SN123456789">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="devicePassword" class="form-label">Пароль</label>
-                        <input type="password" class="form-control" id="devicePassword" name="device_password"
-                               placeholder="Необязательно" autocomplete="new-password" inputmode="text">
-                    </div>
-                    <div class="col-md-3 required">
+                    <div class="col-md-4 required">
                         <label for="model" class="form-label">Модель</label>
                         <select class="form-control" id="model" name="model">
                             <option value="">Выберите или введите...</option>
@@ -648,8 +637,7 @@
     <script>
         const form = document.getElementById('crmForm');
         const phoneInput = document.getElementById('phone');
-        const emailInput = document.getElementById('email');
-        const serialInput = document.getElementById('serialNumber');
+        const addressInput = document.getElementById('address');
         const customerInfoAlert = document.getElementById('customerInfoAlert');
         const duplicateAlert = document.getElementById('duplicateAlert');
         const deviceHistoryCard = document.getElementById('deviceHistoryCard');
@@ -691,8 +679,6 @@
                 document.getElementById('clientName').value = customer.name || '';
                 phoneInput.value = customer.phone || '';
                 phoneInput.dataset.normalized = customer.phone ? customer.phone.replace(/\D/g, '') : '';
-                emailInput.value = customer.email || '';
-                
                 // Запускаем поиск клиента для получения устройств и последней заявки
                 if (phoneInput.dataset.normalized && phoneInput.dataset.normalized.length >= 10) {
                     setTimeout(() => {
@@ -871,7 +857,6 @@
                 phoneInput.value = formatPhoneDisplay(c.phone || '');
                 phoneInput.dataset.normalized = normalizePhoneClient(c.phone || '');
             }
-            if (emailInput) emailInput.value = c.email || '';
             hideClientNameSuggest();
 
             const normalized = (phoneInput && phoneInput.dataset.normalized) ? phoneInput.dataset.normalized : '';
@@ -914,14 +899,12 @@
                 btn.className = 'suggest-item';
                 btn.dataset.idx = String(idx);
                 const phoneTxt = c.phone_display || c.phone || '';
-                const emailTxt = c.email || '';
                 const nameEl = document.createElement('span');
                 nameEl.className = 'suggest-name';
                 nameEl.textContent = c.name || '—';
                 btn.appendChild(nameEl);
                 const metaParts = [];
                 if (phoneTxt) metaParts.push(phoneTxt);
-                if (emailTxt) metaParts.push(emailTxt);
                 if (metaParts.length) {
                     const metaEl = document.createElement('span');
                     metaEl.className = 'suggest-meta';
@@ -1417,7 +1400,7 @@
 
         // Быстрый выбор из поисковых списков: "~" / "ё" = выбрать и перейти дальше.
         bindTildeSelect(tomDeviceType, tomDeviceBrand);
-        bindTildeSelect(tomDeviceBrand, '#serialNumber');
+        bindTildeSelect(tomDeviceBrand, tomModel);
         bindTildeSelect(tomModel, () => tomSymptomTags);
 
         const tomSymptomTags = createPersistentTagSelect(
@@ -1826,11 +1809,11 @@
             }
         });
 
-        if (serialInput) {
-        serialInput.addEventListener('blur', () => {
+        if (addressInput) {
+        addressInput.addEventListener('blur', () => {
             const normalized = phoneInput.dataset.normalized || '';
             if (!normalized) return;
-            triggerDuplicateCheck(normalized, serialInput.value.trim());
+            triggerDuplicateCheck(normalized, addressInput.value.trim());
         });
         }
 
@@ -1865,9 +1848,6 @@
                         if (!document.getElementById('clientName').value.trim()) {
                             document.getElementById('clientName').value = data.customer.name || '';
                         }
-                        if (!emailInput.value.trim() && data.customer.email) {
-                            emailInput.value = data.customer.email;
-                        }
                     }
                 })
                 .catch((error) => {
@@ -1877,11 +1857,11 @@
                 });
         }
 
-        function triggerDuplicateCheck(phone, serial) {
+        function triggerDuplicateCheck(phone, address) {
             fetch('/api/orders/check_duplicate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone, serial_number: serial }),
+                body: JSON.stringify({ phone, address }),
             })
                 .then(res => {
                     if (!res.ok) {
@@ -1917,7 +1897,7 @@
             customerInfoAlert.appendChild(strong);
             
             const info = document.createTextNode(
-                ` ${customer.name || '—'} | ${customer.phone_display || formatPhoneDisplay(customer.phone || '')}${customer.email ? ` | ${customer.email}` : ''}`
+                ` ${customer.name || '—'} | ${customer.phone_display || formatPhoneDisplay(customer.phone || '')}`
             );
             customerInfoAlert.appendChild(info);
         }
@@ -1949,14 +1929,13 @@
                 btn.className = 'btn btn-outline-info btn-sm me-2 mb-2 device-history-btn';
                 btn.dataset.type = device.device_type_id || '';
                 btn.dataset.brand = device.device_brand_id || '';
-                btn.dataset.serial = device.serial_number || '';
                 
                 const icon = document.createElement('i');
                 icon.className = 'fas fa-laptop me-1';
                 btn.appendChild(icon);
                 
                 const text = document.createTextNode(
-                    `${device.device_type || ''} ${device.device_brand || ''}${device.serial_number ? ` (#${device.serial_number})` : ''}`
+                    `${device.device_type || ''} ${device.device_brand || ''}`
                 );
                 btn.appendChild(text);
                 
@@ -1971,7 +1950,6 @@
             applyDeviceFromHistory({
                 device_type_id: btn.dataset.type,
                 device_brand_id: btn.dataset.brand,
-                serial_number: btn.dataset.serial || '',
             });
         });
         }
@@ -1982,9 +1960,6 @@
             }
             if (device.device_brand_id && tomDeviceBrand) {
                 tomDeviceBrand.setValue(device.device_brand_id, true);
-            }
-            if (device.serial_number !== undefined && serialInput) {
-                serialInput.value = device.serial_number;
             }
         }
 
@@ -2004,7 +1979,7 @@
             phoneInput.value = formatPhoneDisplay(order.phone || '');
             phoneInput.dataset.normalized = normalizePhoneClient(order.phone || '');
             }
-            if (emailInput) emailInput.value = order.email || '';
+            if (addressInput) addressInput.value = order.address || '';
             
             // Заполняем данные об устройстве
             if (order.device_type_id && tomDeviceType) {
@@ -2013,9 +1988,6 @@
             if (order.device_brand_id && tomDeviceBrand) {
                 tomDeviceBrand.setValue(String(order.device_brand_id), true);
             }
-            const serialNumberInput = document.getElementById('serialNumber');
-            if (serialNumberInput) serialNumberInput.value = order.serial_number || '';
-            
             // Заполняем модель
             if (order.model && tomModel) {
                 // Проверяем, есть ли такая опция, если нет - добавляем
@@ -2041,8 +2013,6 @@
             if (prepaymentInput) prepaymentInput.value = order.prepayment || '0';
             // Обновляем состояние поля способа предоплаты
             updatePrepaymentMethodState();
-            const passwordInput = document.getElementById('devicePassword');
-            if (passwordInput) passwordInput.value = order.password || '';
             const managerInput = document.getElementById('manager');
             if (managerInput) managerInput.value = order.manager_id || '';
             const masterInput = document.getElementById('master');
@@ -2067,7 +2037,7 @@
         function showDuplicateAlert(duplicates) {
             if (!duplicateAlert) return;
             
-            if (!duplicates || (!duplicates.by_phone && !duplicates.by_serial)) {
+            if (!duplicates || (!duplicates.by_phone && !duplicates.by_address)) {
                 clearDuplicateAlert();
                 return;
             }
@@ -2089,8 +2059,8 @@
             if (duplicates.by_phone) {
                 parts.push(`По телефону уже есть заявка #${duplicates.by_phone.order_id} (${duplicates.by_phone.status || '—'}).`);
             }
-            if (duplicates.by_serial) {
-                parts.push(`По серийному номеру уже есть заявка #${duplicates.by_serial.order_id} (${duplicates.by_serial.status || '—'}).`);
+            if (duplicates.by_address) {
+                parts.push(`По этому адресу уже есть заявка #${duplicates.by_address.order_id} (${duplicates.by_address.status || '—'}).`);
             }
             
             parts.forEach((part, index) => {
@@ -2123,39 +2093,8 @@
         });
         }
 
-        // Валидация email
-        function validateEmail(email) {
-            if (!email) return true; // Email не обязателен
-            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return re.test(email);
-        }
-        
-        if (emailInput) {
-        emailInput.addEventListener('blur', () => {
-            const email = emailInput.value.trim();
-            if (email && !validateEmail(email)) {
-                emailInput.setCustomValidity('Неверный формат email');
-                emailInput.classList.add('is-invalid');
-            } else {
-                emailInput.setCustomValidity('');
-                emailInput.classList.remove('is-invalid');
-            }
-        });
-        }
-        
         if (form) {
         form.addEventListener('submit', (e) => {
-            // Валидация email
-                if (emailInput) {
-            const email = emailInput.value.trim();
-            if (email && !validateEmail(email)) {
-                e.preventDefault();
-                alert('Неверный формат email адреса.');
-                emailInput.focus();
-                return;
-                    }
-            }
-            
             // Проверяем и нормализуем device_type_id и device_brand_id
             const deviceTypeSelect = document.getElementById('deviceType');
             const deviceBrandSelect = document.getElementById('deviceBrand');
@@ -2250,9 +2189,8 @@
         }
 
         bindEnterNext('#clientName', '#phone');
-        bindEnterNext('#phone', tomDeviceType);
-        bindEnterNext('#serialNumber', '#devicePassword');
-        bindEnterNext('#devicePassword', tomModel);
+        bindEnterNext('#phone', '#address');
+        bindEnterNext('#address', tomDeviceType);
         bindEnterNext('#estimated_cost', '#prepayment');
         bindEnterNext('#prepayment', '#manager');
         bindEnterNext('#manager', '#master');

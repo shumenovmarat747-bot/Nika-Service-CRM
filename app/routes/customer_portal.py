@@ -367,6 +367,8 @@ def _portal_public_order(order_data: dict) -> dict:
     drop = {
         "password",
         "device_password",
+        "email",
+        "serial_number",
         "comment",
         "manager_id",
         "master_id",
@@ -444,6 +446,11 @@ def portal_api_order(order_id):
         if order_data.get('customer_id') != customer_id:
             return jsonify({'success': False, 'error': 'Доступ запрещён'}), 403
         order_public = _portal_public_order(order_data)
+        device_public = {
+            key: value
+            for key, value in (full.get('device') or {}).items()
+            if key not in {'serial_number', 'password', 'customer_email'}
+        }
         files = []
         try:
             from app.services.order_diagnostics_service import OrderDiagnosticsService
@@ -452,7 +459,7 @@ def portal_api_order(order_id):
             files = []
         out = {
             'order': order_public,
-            'device': full.get('device'),
+            'device': device_public,
             'services': sanitize_portal_order_lines(full.get('services', [])),
             'parts': sanitize_portal_order_lines(full.get('parts', [])),
             'payments': full.get('payments', []),
@@ -560,6 +567,8 @@ def portal_devices():
         devices_with_orders = []
         for device in devices_raw:
             dev_dict = device.to_dict()
+            for legacy_field in ('serial_number', 'password', 'customer_email'):
+                dev_dict.pop(legacy_field, None)
             orders = DeviceService.get_device_orders(device.id)
             last_order_date = orders[0]['created_at'] if orders else None
             devices_with_orders.append({'device': dev_dict, 'orders': orders, 'last_order_date': last_order_date})

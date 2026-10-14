@@ -155,7 +155,7 @@ def create_employee():
     
     Body:
         full_name: ФИО (видимое имя)
-        login: Логин (email для входа)
+        login: Логин для входа
         password: Пароль
         role: Роль (admin, manager, master)
         salary_rule_type: Тип правила зарплаты (для manager/master)
@@ -174,8 +174,8 @@ def create_employee():
         if not full_name:
             return jsonify({'success': False, 'error': 'ФИО обязательно'}), 400
         
-        if not login:
-            return jsonify({'success': False, 'error': 'Логин (email) обязателен'}), 400
+        from app.utils.validators import validate_login
+        login = validate_login(login)
         
         if not password:
             return jsonify({'success': False, 'error': 'Пароль обязателен'}), 400
@@ -194,12 +194,6 @@ def create_employee():
         
         # Получаем права по умолчанию для роли
         default_permission_ids = get_default_permission_ids_for_role(role)
-        
-        # Валидация email для логина
-        import re
-        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-        if not re.match(email_pattern, login):
-            return jsonify({'success': False, 'error': 'Логин должен быть валидным email адресом'}), 400
         
         # Создаем пользователя
         if role == 'admin':
@@ -333,7 +327,7 @@ def update_employee(employee_id):
     
     Body:
         full_name: ФИО (опционально)
-        login: Логин/email (опционально)
+        login: Логин (опционально)
         password: Новый пароль (опционально)
         role: Роль (опционально, только для админов)
         is_active: Активен (1/0) (опционально)
@@ -358,12 +352,8 @@ def update_employee(employee_id):
             if 'full_name' in data:
                 updates['display_name'] = data['full_name'].strip()
             if 'login' in data:
-                # Валидация email
-                import re
-                email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-                if not re.match(email_pattern, data['login']):
-                    return jsonify({'success': False, 'error': 'Логин должен быть валидным email адресом'}), 400
-                updates['username'] = data['login'].strip()
+                from app.utils.validators import validate_login
+                updates['username'] = validate_login(data['login'])
             if 'password' in data and data['password']:
                 UserService.change_password(employee_id, data['password'])
             if 'is_active' in data or 'active' in data:
@@ -414,11 +404,10 @@ def update_employee(employee_id):
                 ManagerService.update_manager(employee_id, **manager_updates)
             
             # Обновляем или создаём пользователя для входа (логин всегда сохраняем при указании)
-            import re
-            email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
             login_val = (data.get('login') or '').strip()
-            if login_val and not re.match(email_pattern, login_val):
-                return jsonify({'success': False, 'error': 'Логин должен быть валидным email адресом'}), 400
+            if login_val:
+                from app.utils.validators import validate_login
+                login_val = validate_login(login_val)
             
             if manager.get('user_id'):
                 user_updates = {}
@@ -480,11 +469,10 @@ def update_employee(employee_id):
                 MasterService.update_master(employee_id, **master_updates)
             
             # Обновляем или создаём пользователя для входа (логин всегда сохраняем при указании)
-            import re
-            email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
             login_val = (data.get('login') or '').strip()
-            if login_val and not re.match(email_pattern, login_val):
-                return jsonify({'success': False, 'error': 'Логин должен быть валидным email адресом'}), 400
+            if login_val:
+                from app.utils.validators import validate_login
+                login_val = validate_login(login_val)
             
             if master.get('user_id'):
                 user_updates = {}

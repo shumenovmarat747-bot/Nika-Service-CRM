@@ -15,9 +15,6 @@
         <h5 class="mb-0">
             <i class="fas fa-laptop me-2 text-primary"></i>
             {{ d.device_type or '—' }} {{ d.device_brand or '' }}
-            {% if d.serial_number %}
-            <small class="text-muted ms-2">№ {{ d.serial_number }}</small>
-            {% endif %}
         </h5>
     </div>
     <div class="card-body">
